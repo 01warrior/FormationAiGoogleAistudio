@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore, allVerbs, lessons } from './store';
+import { playSuccessSound, playErrorSound } from './audio';
 
 export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: () => void }) {
   const { addXp, updateVerbMastery, completeLesson } = useAppStore();
@@ -47,10 +48,12 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
     
     if (acceptedAnswers.includes(input.trim().toLowerCase())) {
       setIsCorrect(true);
+      playSuccessSound();
       updateVerbMastery(currentVerb.base, 'mastered');
       addXp(5); // Mini XP for correct answer
     } else {
       setIsCorrect(false);
+      playErrorSound();
       updateVerbMastery(currentVerb.base, 'learning');
     }
   };

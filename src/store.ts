@@ -21,6 +21,9 @@ export interface UserState {
   xp: number;
   verbProgress: Record<string, UserVerbProgress>; // key is base verb
   completedLessons: string[];
+  dailyGoal: number;
+  lessonsCompletedToday: number;
+  lastLessonDate: string | null;
 }
 
 export interface Lesson {
@@ -53,10 +56,23 @@ const DEFAULT_STATE: UserState = {
   xp: 0,
   verbProgress: {},
   completedLessons: [],
+  dailyGoal: 1,
+  lessonsCompletedToday: 0,
+  lastLessonDate: null,
 };
+
+function isToday(dateString: string | null) {
+  if (!dateString) return false;
+  const d = new Date(dateString);
+  const today = new Date();
+  return d.getDate() === today.getDate() && 
+         d.getMonth() === today.getMonth() && 
+         d.getFullYear() === today.getFullYear();
+}
 
 // Global State Management
 let globalState: UserState = DEFAULT_STATE;
+
 const saved = localStorage.getItem('verbmaster_state');
 
 if (saved) {
@@ -67,7 +83,10 @@ if (saved) {
       ...parsed,
       verbProgress: parsed.verbProgress || {},
       completedLessons: parsed.completedLessons || [],
-      xp: parsed.xp || 0
+      xp: parsed.xp || 0,
+      dailyGoal: parsed.dailyGoal || 1,
+      lessonsCompletedToday: parsed.lessonsCompletedToday || 0,
+      lastLessonDate: parsed.lastLessonDate || null
     };
     // Calculate streak
     const lastActiveDate = new Date(globalState.lastActive || new Date());
@@ -86,6 +105,12 @@ if (saved) {
     }
     
     globalState.lastActive = new Date().toISOString();
+
+    // Reset daily lessons completed if last lesson wasn't today
+    if (!isToday(globalState.lastLessonDate)) {
+      globalState.lessonsCompletedToday = 0;
+    }
+
     localStorage.setItem('verbmaster_state', JSON.stringify(globalState));
   } catch (e) {
     globalState = DEFAULT_STATE;
@@ -128,14 +153,28 @@ export function useAppStore() {
     }));
   };
   
+  const setDailyGoal = (goal: number) => {
+    setGlobalState(s => ({ ...s, dailyGoal: Math.max(1, goal) }));
+  };
+
   const completeLesson = (id: string) => {
     setGlobalState(s => {
+      // Handle daily goal increment
+      const isStillToday = isToday(s.lastLessonDate);
+      const newLessonsCompleted = isStillToday ? s.lessonsCompletedToday + 1 : 1;
+      
+      const newState = {
+        ...s,
+        lessonsCompletedToday: newLessonsCompleted,
+        lastLessonDate: new Date().toISOString()
+      };
+
       if (!s.completedLessons.includes(id)) {
-        return { ...s, completedLessons: [...s.completedLessons, id] };
+        return { ...newState, completedLessons: [...s.completedLessons, id] };
       }
-      return s;
+      return newState;
     });
   }
 
-  return { state, addXp, updateVerbMastery, completeLesson };
+  return { state, addXp, updateVerbMastery, completeLesson, setDailyGoal };
 }
