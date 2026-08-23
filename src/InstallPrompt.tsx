@@ -107,7 +107,7 @@ export function InstallPrompt() {
           
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-background rounded-xl overflow-hidden flex items-center justify-center border-2 border-surface-variant flex-shrink-0">
-              <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
+              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h4 className="font-label-bold text-on-surface">Install VerbMaster</h4>
@@ -141,7 +141,7 @@ export function InstallPrompt() {
           
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-background rounded-xl overflow-hidden flex items-center justify-center border-2 border-surface-variant flex-shrink-0">
-              <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
+              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="font-label-bold text-on-surface">Install VerbMaster</h4>
