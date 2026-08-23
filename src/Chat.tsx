@@ -66,10 +66,10 @@ export function Chat() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-margin-mobile flex flex-col gap-4 scroll-smooth">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-2xl p-4 font-body-md shadow-sm ${
+            <div className={`max-w-[85%] rounded-[24px] px-5 py-3.5 font-body-md leading-relaxed ${
               m.sender === 'user' 
-                ? 'bg-primary text-on-primary rounded-br-sm' 
-                : 'bg-surface-container-high text-on-surface rounded-bl-sm border border-surface-variant'
+                ? 'bg-primary text-on-primary rounded-br-md shadow-[0_4px_12px_rgba(0,0,0,0.08)]' 
+                : 'bg-surface-variant/30 text-on-surface rounded-bl-md'
             }`}>
               {m.text}
             </div>
