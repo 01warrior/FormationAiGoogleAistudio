@@ -11,7 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['logo.jpg'],
+        includeAssets: ['icon-192.png', 'icon-512.png', 'icon-144.png'],
         manifest: {
           name: 'VerbMaster',
           short_name: 'VerbMaster',
