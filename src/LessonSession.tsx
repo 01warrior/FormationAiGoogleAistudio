@@ -11,6 +11,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [targetForm, setTargetForm] = useState<'pastSimple' | 'pastParticiple'>('pastSimple');
   const [isLessonComplete, setIsLessonComplete] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // Randomize the target form on mount and index change
   useEffect(() => {
@@ -84,8 +85,36 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
 
   return (
     <div className="absolute inset-0 bg-background z-50 flex flex-col">
+      {showExitConfirm && (
+        <div className="absolute inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-pop-in">
+          <div className="bg-surface-container-lowest w-full max-w-sm rounded-[32px] border-4 border-surface-variant p-stack-lg shadow-xl flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mb-4 text-error">
+               <span className="material-symbols-outlined text-[32px]" style={{fontVariationSettings: "'FILL' 1"}}>warning</span>
+            </div>
+            <h2 className="font-headline-lg-mobile text-on-surface mb-2">Quit Lesson?</h2>
+            <p className="font-body-md text-on-surface-variant mb-8">
+              Are you sure you want to stop here? You will lose your progress for this lesson.
+            </p>
+            <div className="flex gap-4 w-full">
+              <button 
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 h-12 bg-surface-container-low border-2 border-surface-variant border-b-4 text-on-surface font-label-bold rounded-xl active:translate-y-[2px] active:border-b-2 transition-all"
+              >
+                Keep Learning
+              </button>
+              <button 
+                onClick={onBack}
+                className="flex-1 h-12 bg-error border-b-4 border-red-800 text-on-error font-label-bold rounded-xl active:translate-y-[2px] active:border-b-2 transition-all"
+              >
+                Quit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="flex items-center px-margin-mobile h-[64px] shrink-0 gap-4 mt-2">
-        <button onClick={onBack} aria-label="Close session" className="w-[48px] h-[48px] flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors active:scale-95 touch-manipulation flex-shrink-0">
+        <button onClick={() => setShowExitConfirm(true)} aria-label="Close session" className="w-[48px] h-[48px] flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors active:scale-95 touch-manipulation flex-shrink-0">
           <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 0, 'wght' 600"}}>close</span>
         </button>
         <div className="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden flex items-center p-0.5">

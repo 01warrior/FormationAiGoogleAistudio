@@ -63,12 +63,12 @@
   --spacing-margin-mobile: 20px;
   --spacing-safe-bottom: env(safe-area-inset-bottom, 20px);
 
-  --font-family-headline-lg-mobile: "Plus Jakarta Sans", sans-serif;
-  --font-family-body-md: "Plus Jakarta Sans", sans-serif;
-  --font-family-mono-verb: "Plus Jakarta Sans", sans-serif;
-  --font-family-label-bold: "Plus Jakarta Sans", sans-serif;
-  --font-family-headline-lg: "Plus Jakarta Sans", sans-serif;
-  --font-family-display-verb: "Plus Jakarta Sans", sans-serif;
+  --font-family-headline-lg-mobile: "Poppins", sans-serif;
+  --font-family-body-md: "Poppins", sans-serif;
+  --font-family-mono-verb: "Poppins", sans-serif;
+  --font-family-label-bold: "Poppins", sans-serif;
+  --font-family-headline-lg: "Poppins", sans-serif;
+  --font-family-display-verb: "Poppins", sans-serif;
 
   --font-size-headline-lg-mobile: 20px;
   --font-weight-headline-lg-mobile: 700;
