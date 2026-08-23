@@ -62,8 +62,8 @@ export function Chat() {
   };
 
   return (
-    <main className="flex-grow w-full max-w-2xl mx-auto flex flex-col h-[calc(100vh-140px)] relative">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-margin-mobile flex flex-col gap-4 pb-[100px] scroll-smooth">
+    <main className="flex-grow w-full max-w-2xl mx-auto flex flex-col relative pb-[80px] md:pb-0 h-[calc(100vh-72px)]">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-margin-mobile flex flex-col gap-4 scroll-smooth">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] rounded-2xl p-4 font-body-md shadow-sm ${
@@ -77,7 +77,7 @@ export function Chat() {
         ))}
       </div>
       
-      <form onSubmit={handleSend} className="absolute bottom-[80px] md:bottom-0 left-0 w-full bg-surface/90 backdrop-blur-sm border-t border-surface-variant p-4 flex gap-2 max-w-2xl mx-auto">
+      <form onSubmit={handleSend} className="bg-surface/90 backdrop-blur-sm border-t border-surface-variant p-4 flex gap-2 w-full shrink-0">
         <input 
           type="text" 
           value={input}

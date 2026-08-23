@@ -11,19 +11,19 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['icon.svg'],
+        includeAssets: ['logo.jpg'],
         manifest: {
           name: 'VerbMaster',
           short_name: 'VerbMaster',
           description: 'Master English irregular verbs easily',
-          theme_color: '#4F46E5', // Primary color
+          theme_color: '#ffffff', // Primary color
           background_color: '#F8FAFC', // Background color
           display: 'standalone',
           icons: [
             {
-              src: 'icon.svg',
+              src: 'logo.jpg',
               sizes: '192x192 512x512',
-              type: 'image/svg+xml',
+              type: 'image/jpeg',
               purpose: 'any maskable'
             }
           ]

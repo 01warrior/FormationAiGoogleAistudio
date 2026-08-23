@@ -4,6 +4,7 @@ import { LearnTimeline } from './LearnTimeline';
 import { VerbsList } from './VerbsList';
 import { Flashcards } from './Flashcards';
 import { Chat } from './Chat';
+import { InstallPrompt } from './InstallPrompt';
 import { useAppStore } from './store';
 
 type Tab = 'home' | 'learn' | 'verbs' | 'chat' | 'flashcards';
@@ -87,6 +88,7 @@ export default function App() {
         <MobileNavItem tab="verbs" icon="menu_book" label="Verbs" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="chat" icon="forum" label="Chat" activeTab={activeTab} onClick={setActiveTab} />
       </nav>
+      <InstallPrompt />
     </div>
   );
 }
