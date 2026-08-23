@@ -1,15 +1,15 @@
 import React from 'react';
 import { useAppStore, allVerbs } from './store';
 
-export function Home() {
+export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
   const { state } = useAppStore();
   
-  const totalMastered = Object.values(state.verbProgress).filter(v => v.level === 'mastered').length;
+  const totalMastered = Object.values(state.verbProgress || {}).filter((v: any) => v.level === 'mastered').length;
   const totalVerbs = allVerbs.length;
   const progressPercent = Math.round((totalMastered / totalVerbs) * 100) || 0;
 
-  const recentMasteredVerbs = Object.entries(state.verbProgress)
-    .filter(([_, data]) => data.level === 'mastered')
+  const recentMasteredVerbs = Object.entries(state.verbProgress || {})
+    .filter(([_, data]: [string, any]) => data.level === 'mastered')
     .slice(-3)
     .map(([base]) => allVerbs.find(v => v.base === base))
     .filter(Boolean);
@@ -40,7 +40,7 @@ export function Home() {
             You are {progressPercent}% of the way to mastering irregular verbs!
           </p>
           
-          <button className="w-full md:w-auto min-h-touch-target-min bg-primary text-on-primary font-label-bold text-label-bold px-8 py-3 rounded-xl border-b-4 border-surface-tint hover:bg-surface-tint transition-colors press-effect mt-stack-sm flex items-center justify-center gap-2">
+          <button onClick={onStartLearning} className="w-full md:w-auto min-h-touch-target-min bg-primary text-on-primary font-label-bold text-label-bold px-8 py-3 rounded-xl border-b-4 border-surface-tint hover:bg-surface-tint transition-colors press-effect mt-stack-sm flex items-center justify-center gap-2">
             <span className="material-symbols-outlined">play_arrow</span>
             Start Learning
           </button>

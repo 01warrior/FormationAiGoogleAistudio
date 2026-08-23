@@ -14,12 +14,12 @@ export default function App() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'home': return <Home />;
+      case 'home': return <Home onStartLearning={() => setActiveTab('learn')} />;
       case 'learn': return <LearnTimeline />;
       case 'verbs': return <VerbsList />;
       case 'chat': return <Chat />;
       case 'flashcards': return <Flashcards />;
-      default: return <Home />;
+      default: return <Home onStartLearning={() => setActiveTab('learn')} />;
     }
   };
 

@@ -1,27 +1,52 @@
 import React, { useState } from 'react';
-import { allVerbs } from './store';
+import { allVerbs, useAppStore } from './store';
 
 export function Flashcards() {
+  const { state, updateVerbMastery, addXp } = useAppStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const verbs = allVerbs.slice(0, 50); // Just use the first 50 for now or filter by 'toLearn'
-  const currentVerb = verbs[currentIndex];
+  // Focus on verbs not yet mastered
+  let verbsToLearn = allVerbs.filter(v => (state.verbProgress || {})[v.base]?.level !== 'mastered');
+  // Fallback if user mastered everything
+  if (verbsToLearn.length === 0) {
+    verbsToLearn = allVerbs;
+  }
+
+  const currentVerb = verbsToLearn[currentIndex % verbsToLearn.length];
 
   const handleNext = () => {
     setIsFlipped(false);
     setTimeout(() => {
-      setCurrentIndex(prev => (prev + 1) % verbs.length);
+      setCurrentIndex(prev => prev + 1);
     }, 150); // Wait for unflip
+  };
+
+  const handleKnowIt = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (currentVerb) {
+      updateVerbMastery(currentVerb.base, 'mastered');
+      addXp(5);
+    }
+    handleNext();
+  };
+
+  const handleReviewLater = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (currentVerb) {
+      updateVerbMastery(currentVerb.base, 'learning');
+    }
+    handleNext();
   };
 
   if (!currentVerb) return null;
 
   return (
     <main className="flex-grow flex flex-col items-center justify-center p-margin-mobile pb-[100px] md:pb-margin-mobile relative w-full max-w-2xl mx-auto">
-      <div className="w-full flex gap-2 mb-stack-lg px-4 justify-center">
-        <div className="h-2 flex-1 bg-surface-variant rounded-full overflow-hidden">
-          <div className="h-full bg-tertiary-container w-full rounded-full" style={{width: `${((currentIndex+1)/verbs.length)*100}%`}}></div>
+      <div className="w-full flex flex-col items-center mb-stack-lg px-4 justify-center">
+        <h2 className="font-label-bold text-on-surface-variant mb-2">Card {currentIndex + 1}</h2>
+        <div className="h-2 w-full max-w-xs bg-surface-variant rounded-full overflow-hidden">
+          <div className="h-full bg-tertiary-container rounded-full" style={{width: `${((currentIndex % verbsToLearn.length + 1) / verbsToLearn.length) * 100}%`}}></div>
         </div>
       </div>
 
@@ -67,22 +92,24 @@ export function Flashcards() {
             <span className="material-symbols-outlined">sync</span>
             Flip Card
           </button>
-          <button 
-            onClick={handleNext}
-            className="flex-1 bg-primary border-b-[6px] border-on-primary-fixed-variant text-on-primary font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2"
-          >
-            Next
-            <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
+          {!isFlipped && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); handleNext(); }}
+              className="flex-1 bg-primary border-b-[6px] border-on-primary-fixed-variant text-on-primary font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2"
+            >
+              Next
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </button>
+          )}
         </div>
 
         {isFlipped && (
           <div className="flex gap-gutter w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <button onClick={handleNext} className="flex-1 bg-surface border-2 border-secondary-container border-b-4 text-on-surface font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-2 active:translate-y-1 transition-all flex flex-col items-center justify-center py-2">
+            <button onClick={handleReviewLater} className="flex-1 bg-surface border-2 border-secondary-container border-b-4 text-on-surface font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-2 active:translate-y-1 transition-all flex flex-col items-center justify-center py-2">
               <span className="material-symbols-outlined text-secondary-container" style={{fontVariationSettings: "'FILL' 1"}}>history</span>
               Review Later
             </button>
-            <button onClick={handleNext} className="flex-1 bg-surface border-2 border-tertiary border-b-4 text-on-surface font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-2 active:translate-y-1 transition-all flex flex-col items-center justify-center py-2">
+            <button onClick={handleKnowIt} className="flex-1 bg-surface border-2 border-tertiary border-b-4 text-on-surface font-label-bold text-label-bold h-touch-target-min rounded-xl active:border-b-2 active:translate-y-1 transition-all flex flex-col items-center justify-center py-2">
               <span className="material-symbols-outlined text-tertiary" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
               I Know It
             </button>

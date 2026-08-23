@@ -15,17 +15,22 @@ export function LearnTimeline() {
       <div className="absolute top-stack-lg bottom-0 w-4 path-line left-1/2 -translate-x-1/2 z-0"></div>
       
       {lessons.map((lesson, idx) => {
-        const isCompleted = state.completedLessons.includes(lesson.id);
-        const isNext = !isCompleted && (idx === 0 || state.completedLessons.includes(lessons[idx-1].id));
+        const completedLessons = state.completedLessons || [];
+        const isCompleted = completedLessons.includes(lesson.id);
+        const isNext = !isCompleted && (idx === 0 || completedLessons.includes(lessons[idx-1].id));
         const isLocked = !isCompleted && !isNext;
         
         return (
           <div key={lesson.id} className={`w-full flex flex-col items-center mb-stack-lg z-10 relative ${isLocked ? 'opacity-70' : ''}`}>
-            {idx === 0 || lessons[idx-1].type !== lesson.type ? (
-              <div className={`px-stack-md py-stack-sm rounded-xl border-b-4 font-headline-lg-mobile text-headline-lg-mobile shadow-md mb-stack-lg w-full max-w-[280px] text-center transition-transform ${isLocked ? 'bg-surface-variant text-on-surface-variant border-outline-variant' : 'bg-primary-container text-on-primary-container border-primary hover:scale-[1.02]'}`}>
+            
+            <div className="flex flex-col items-center mb-8 w-full">
+              <div className={`px-stack-md py-stack-sm rounded-xl border-b-4 font-headline-lg-mobile text-headline-lg-mobile shadow-md mb-2 w-full max-w-[280px] text-center transition-transform ${isLocked ? 'bg-surface-variant text-on-surface-variant border-outline-variant' : 'bg-primary-container text-on-primary-container border-primary hover:scale-[1.02]'}`}>
                 {lesson.title}
               </div>
-            ) : null}
+              <div className="text-sm font-label-bold text-outline uppercase tracking-wider">
+                {lesson.description}
+              </div>
+            </div>
 
             <button 
               disabled={isLocked}

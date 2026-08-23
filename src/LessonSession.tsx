@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore, allVerbs, lessons } from './store';
 
 export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: () => void }) {
@@ -9,11 +9,17 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
   const [currentVerbIdx, setCurrentVerbIdx] = useState(0);
   const [input, setInput] = useState('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [targetForm, setTargetForm] = useState<'pastSimple' | 'pastParticiple'>('pastSimple');
+  const [isLessonComplete, setIsLessonComplete] = useState(false);
 
-  if (!lesson || verbs.length === 0) return <div onClick={onBack}>Error loading lesson</div>;
+  // Randomize the target form on mount and index change
+  useEffect(() => {
+    setTargetForm(Math.random() > 0.5 ? 'pastSimple' : 'pastParticiple');
+  }, [currentVerbIdx]);
+
+  if (!lesson || verbs.length === 0) return <div onClick={onBack} className="p-8">Error loading lesson...</div>;
 
   const currentVerb = verbs[currentVerbIdx];
-  const isFinished = currentVerbIdx >= verbs.length;
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -27,21 +33,54 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
         // Finish lesson
         completeLesson(lessonId);
         addXp(50);
-        onBack();
+        setIsLessonComplete(true);
       }
       return;
     }
 
-    if (input.toLowerCase().trim() === currentVerb.pastSimple.toLowerCase()) {
+    if (!input.trim()) return;
+
+    // Validate logic (handle comma separated answers like "was, were")
+    const expectedStr = targetForm === 'pastSimple' ? currentVerb.pastSimple : currentVerb.pastParticiple;
+    const acceptedAnswers = expectedStr.split(',').map(s => s.trim().toLowerCase());
+    
+    if (acceptedAnswers.includes(input.trim().toLowerCase())) {
       setIsCorrect(true);
       updateVerbMastery(currentVerb.base, 'mastered');
+      addXp(5); // Mini XP for correct answer
     } else {
       setIsCorrect(false);
       updateVerbMastery(currentVerb.base, 'learning');
     }
   };
 
-  if (isFinished) return null;
+  if (isLessonComplete) {
+    return (
+      <div className="absolute inset-0 bg-surface-bright z-50 flex flex-col items-center justify-center p-margin-mobile animate-slide-up">
+        <div className="flex-1 flex flex-col items-center justify-center w-full animate-pop-in">
+          <div className="w-32 h-32 bg-secondary-container rounded-full flex items-center justify-center mb-8 shadow-[0_0_40px_rgba(255,195,41,0.5)]">
+            <span className="material-symbols-outlined text-[64px] text-secondary" style={{fontVariationSettings: "'FILL' 1"}}>emoji_events</span>
+          </div>
+          <h1 className="font-display-verb text-display-verb text-primary mb-2 text-center">Lesson<br/>Complete!</h1>
+          <p className="font-body-md text-on-surface-variant mb-8 text-center">You've successfully completed<br/>{lesson.title}</p>
+          
+          <div className="bg-surface-container rounded-2xl p-6 flex flex-col items-center border-2 border-surface-variant w-full max-w-xs shadow-sm">
+            <span className="font-label-bold text-outline uppercase tracking-wider mb-2">Rewards Earned</span>
+            <div className="flex items-center gap-2 font-headline-lg-mobile text-secondary-fixed-dim">
+              <span className="material-symbols-outlined text-[28px]" style={{fontVariationSettings: "'FILL' 1"}}>stars</span>
+              <span className="text-[28px] font-bold">+50 XP</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="w-full pb-safe-bottom">
+          <button onClick={onBack} className="w-full h-14 bg-primary text-on-primary rounded-xl font-label-bold text-label-bold text-lg flex items-center justify-center gap-2 btn-physical border-on-primary-fixed-variant touch-manipulation hover:bg-surface-tint">
+            Continue
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 bg-background z-50 flex flex-col">
@@ -58,7 +97,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
 
       <main className="flex-1 overflow-y-auto px-margin-mobile flex flex-col pb-[120px]">
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-stack-md mb-stack-lg">
-          Complete with the past simple form.
+          Complete with the correct form.
         </h1>
         
         <div className="bg-surface-container-low border border-surface-variant card-plate rounded-xl p-stack-md mb-stack-lg flex items-center justify-between">
@@ -75,7 +114,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
 
         <form onSubmit={handleSubmit} className="bg-surface border border-surface-variant card-plate rounded-2xl p-stack-lg shadow-sm flex flex-col gap-stack-lg flex-1">
           <div className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
-            Write the past simple of <span className="font-bold text-primary">{currentVerb.base}</span>:
+            Write the <span className="font-bold text-primary">{targetForm === 'pastSimple' ? 'Past Simple' : 'Past Participle'}</span> of <span className="font-bold text-primary">{currentVerb.base}</span>:
           </div>
           
           <input 
@@ -83,8 +122,10 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isCorrect !== null}
-            className="w-full h-16 rounded-xl bg-surface-container-low border-2 border-surface-variant focus:border-primary focus:ring-0 text-center font-display-verb text-[32px] lowercase outline-none"
+            className="w-full h-16 rounded-xl bg-surface-container-low border-2 border-surface-variant focus:border-primary focus:ring-0 text-center font-display-verb text-[32px] lowercase outline-none transition-colors"
             autoFocus
+            autoComplete="off"
+            autoCorrect="off"
           />
         </form>
       </main>
@@ -101,7 +142,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
                   {isCorrect ? 'Excellent!' : 'Not quite.'}
                 </h2>
                 <p className={`font-body-md text-body-md text-sm ${isCorrect ? 'text-on-success-container/80' : 'text-on-error-container/80'}`}>
-                  The correct answer is '{currentVerb.pastSimple}'.
+                  The correct answer is '{targetForm === 'pastSimple' ? currentVerb.pastSimple : currentVerb.pastParticiple}'.
                 </p>
               </div>
             </div>

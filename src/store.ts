@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import verbsData from './data.json';
 
 export interface Verb {
@@ -23,15 +23,6 @@ export interface UserState {
   completedLessons: string[];
 }
 
-const DEFAULT_STATE: UserState = {
-  streak: 0,
-  lastActive: null,
-  xp: 0,
-  verbProgress: {},
-  completedLessons: [],
-};
-
-// Lessons logic
 export interface Lesson {
   id: string;
   title: string;
@@ -40,39 +31,91 @@ export interface Lesson {
   verbList: string[]; // base verbs
 }
 
-export const lessons: Lesson[] = [
-  { id: 'l1', title: 'Group 1: Common Verbs', description: 'Basics', type: 'lesson', verbList: ['be', 'have', 'do', 'go', 'say'] },
-  { id: 'l2', title: 'Group 2: Communication', description: 'Speaking & Telling', type: 'lesson', verbList: ['tell', 'speak', 'write', 'read', 'hear'] },
-  { id: 'l3', title: 'Group 3: Movement', description: 'Moving around', type: 'lesson', verbList: ['come', 'run', 'walk', 'fly', 'swim'] },
-  { id: 'l4', title: 'Review 1', description: 'Past Participles', type: 'review', verbList: ['be', 'have', 'do', 'go', 'say', 'tell', 'speak'] },
-  { id: 'l5', title: 'Group 4: Actions', description: 'Physical actions', type: 'lesson', verbList: ['make', 'take', 'get', 'give', 'know'] },
-];
-
 export const allVerbs: Verb[] = verbsData as Verb[];
 
-export function useAppStore() {
-  const [state, setState] = useState<UserState>(() => {
-    const saved = localStorage.getItem('verbmaster_state');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return DEFAULT_STATE;
-      }
-    }
-    return DEFAULT_STATE;
+// Dynamically generate lessons covering all verbs
+export const lessons: Lesson[] = [];
+const CHUNK_SIZE = 10;
+for (let i = 0; i < allVerbs.length; i += CHUNK_SIZE) {
+  const chunk = allVerbs.slice(i, i + CHUNK_SIZE);
+  lessons.push({
+    id: `lesson_${Math.floor(i / CHUNK_SIZE) + 1}`,
+    title: `Group ${Math.floor(i / CHUNK_SIZE) + 1}`,
+    description: `${chunk[0].base} to ${chunk[chunk.length - 1].base}`,
+    type: 'lesson',
+    verbList: chunk.map(v => v.base)
   });
+}
+
+const DEFAULT_STATE: UserState = {
+  streak: 1,
+  lastActive: new Date().toISOString(),
+  xp: 0,
+  verbProgress: {},
+  completedLessons: [],
+};
+
+// Global State Management
+let globalState: UserState = DEFAULT_STATE;
+const saved = localStorage.getItem('verbmaster_state');
+
+if (saved) {
+  try {
+    const parsed = JSON.parse(saved);
+    globalState = { 
+      ...DEFAULT_STATE, 
+      ...parsed,
+      verbProgress: parsed.verbProgress || {},
+      completedLessons: parsed.completedLessons || [],
+      xp: parsed.xp || 0
+    };
+    // Calculate streak
+    const lastActiveDate = new Date(globalState.lastActive || new Date());
+    const today = new Date();
+    // Normalize to midnight to check day differences
+    lastActiveDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    
+    const diffTime = today.getTime() - lastActiveDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      globalState.streak += 1;
+    } else if (diffDays > 1) {
+      globalState.streak = 1;
+    }
+    
+    globalState.lastActive = new Date().toISOString();
+    localStorage.setItem('verbmaster_state', JSON.stringify(globalState));
+  } catch (e) {
+    globalState = DEFAULT_STATE;
+  }
+}
+
+const listeners = new Set<React.Dispatch<React.SetStateAction<UserState>>>();
+
+function setGlobalState(updater: (s: UserState) => UserState) {
+  globalState = updater(globalState);
+  localStorage.setItem('verbmaster_state', JSON.stringify(globalState));
+  listeners.forEach(listener => listener(globalState));
+}
+
+export function useAppStore() {
+  const [state, setState] = useState<UserState>(globalState);
 
   useEffect(() => {
-    localStorage.setItem('verbmaster_state', JSON.stringify(state));
-  }, [state]);
+    listeners.add(setState);
+    return () => {
+      listeners.delete(setState);
+    };
+  }, []);
 
   const addXp = (amount: number) => {
-    setState(s => ({ ...s, xp: s.xp + amount }));
+    setGlobalState(s => ({ ...s, xp: s.xp + amount }));
   };
 
   const updateVerbMastery = (base: string, level: MasteryLevel) => {
-    setState(s => ({
+    setGlobalState(s => ({
       ...s,
       verbProgress: {
         ...s.verbProgress,
@@ -86,7 +129,7 @@ export function useAppStore() {
   };
   
   const completeLesson = (id: string) => {
-    setState(s => {
+    setGlobalState(s => {
       if (!s.completedLessons.includes(id)) {
         return { ...s, completedLessons: [...s.completedLessons, id] };
       }

@@ -10,7 +10,7 @@ export function VerbsList() {
     const isMatch = v.base.includes(search.toLowerCase()) || v.translation.includes(search.toLowerCase());
     if (!isMatch) return false;
     
-    const progress = state.verbProgress[v.base]?.level || 'unseen';
+    const progress = (state.verbProgress || {})[v.base]?.level || 'unseen';
     if (filter === 'mastered') return progress === 'mastered';
     if (filter === 'toLearn') return progress !== 'mastered';
     return true;
@@ -48,7 +48,7 @@ export function VerbsList() {
 
       <section className="flex flex-col gap-stack-md">
         {filteredVerbs.map(v => {
-          const level = state.verbProgress[v.base]?.level || 'unseen';
+          const level = (state.verbProgress || {})[v.base]?.level || 'unseen';
           return (
             <article key={v.base} className="w-full bg-surface-container-lowest rounded-xl border-2 border-surface-variant border-b-4 shadow-sm p-stack-md flex flex-col gap-gutter active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer relative overflow-hidden group">
               <div className="flex justify-between items-start">
