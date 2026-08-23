@@ -1,0 +1,6 @@
+{
+	"appId": "com.verbmaster.app",
+	"appName": "VerbMaster",
+	"webDir": "dist",
+	"packageClassList": []
+}

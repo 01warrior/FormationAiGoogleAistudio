@@ -52,15 +52,19 @@ export default function App() {
 
       {/* Mobile Top App Bar */}
       <header className="w-full top-0 sticky z-40 bg-background border-b-4 border-surface-variant flex justify-between items-center px-margin-mobile py-stack-md md:hidden">
-        <button className="text-on-surface-variant hover:opacity-80 active:translate-y-[2px] transition-transform">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
         <h1 className="font-display-verb text-headline-lg-mobile text-primary">VerbMaster</h1>
         <div className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface">
           <div className="flex items-center gap-2 bg-surface-container rounded-full pl-3 pr-1 py-1 border-2 border-surface-variant shadow-sm">
             <span className="text-on-surface">{state.streak || 1}</span>
             <div className="flex items-center justify-center w-7 h-7 rounded-full bg-secondary-container border-2 border-secondary-fixed-dim shadow-sm">
               <span className="material-symbols-outlined text-[16px] text-secondary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>local_fire_department</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 bg-surface-container rounded-full pl-3 pr-1 py-1 border-2 border-surface-variant shadow-sm">
+            <span className="text-on-surface">{state.xp}</span>
+            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-tertiary-container border-2 border-tertiary shadow-sm">
+              <span className="material-symbols-outlined text-[16px] text-tertiary" style={{fontVariationSettings: "'FILL' 1"}}>diamond</span>
             </div>
           </div>
         </div>
