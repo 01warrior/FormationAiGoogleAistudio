@@ -41,6 +41,18 @@ export function InstallPrompt() {
       if (!hasDismissed) {
         setTimeout(() => setShowIosPrompt(true), 2000);
       }
+    } else {
+      // For Android/Desktop: If beforeinstallprompt doesn't fire after a delay, show manual instruction
+      const hasDismissed = localStorage.getItem('dismissedInstallPrompt');
+      if (!hasDismissed) {
+        const timeoutId = setTimeout(() => {
+          if (!deferredPrompt && !showPrompt) {
+            setShowIosPrompt(true); // Re-use the manual prompt UI for Android too
+          }
+        }, 3000);
+        
+        return () => clearTimeout(timeoutId);
+      }
     }
 
     const handler = (e: BeforeInstallPromptEvent) => {
@@ -134,7 +146,11 @@ export function InstallPrompt() {
             <div className="flex-1">
               <h4 className="font-label-bold text-on-surface">Install VerbMaster</h4>
               <p className="font-body-md text-xs text-on-surface-variant leading-tight mt-1">
-                To install, tap <span className="material-symbols-outlined text-[14px] align-middle px-1">ios_share</span> and select <strong>Add to Home Screen</strong>.
+                {isIos ? (
+                  <>To install, tap <span className="material-symbols-outlined text-[14px] align-middle px-1">ios_share</span> and select <strong>Add to Home Screen</strong>.</>
+                ) : (
+                  <>To install, open the browser menu and select <strong>Install App</strong> or <strong>Add to Home Screen</strong>.</>
+                )}
               </p>
             </div>
           </div>
