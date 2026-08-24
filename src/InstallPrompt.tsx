@@ -106,8 +106,8 @@ export function InstallPrompt() {
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container rounded-full blur-2xl -z-10 opacity-50 translate-x-1/2 -translate-y-1/2"></div>
           
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl overflow-hidden flex items-center justify-center border-2 border-primary/20 flex-shrink-0">
-              <span className="material-symbols-outlined text-[32px]">extension</span>
+            <div className="w-14 h-14 bg-background rounded-xl overflow-hidden flex items-center justify-center border-2 border-surface-variant flex-shrink-0">
+              <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <h4 className="font-label-bold text-on-surface">Install VerbMaster</h4>
@@ -140,8 +140,8 @@ export function InstallPrompt() {
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container rounded-full blur-2xl -z-10 opacity-50 translate-x-1/2 -translate-y-1/2"></div>
           
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-primary/10 text-primary rounded-xl overflow-hidden flex items-center justify-center border-2 border-primary/20 flex-shrink-0">
-              <span className="material-symbols-outlined text-[32px]">extension</span>
+            <div className="w-14 h-14 bg-background rounded-xl overflow-hidden flex items-center justify-center border-2 border-surface-variant flex-shrink-0">
+              <img src="/icon-192.png" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="font-label-bold text-on-surface">Install VerbMaster</h4>
