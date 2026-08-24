@@ -1,6 +1,6 @@
 {
   "name": "VerbMaster",
   "description": "Apprenez les verbes irréguliers anglais de façon ludique.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

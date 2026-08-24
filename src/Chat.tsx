@@ -1,96 +1,157 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAppStore, allVerbs } from './store';
+import { pcmToBase64, playAudioChunk, resetAudioQueue } from './liveAudio';
 
 export function Chat() {
-  const { addXp, updateVerbMastery } = useAppStore();
-  const [messages, setMessages] = useState<{sender: 'bot' | 'user', text: string}[]>([]);
-  const [input, setInput] = useState('');
-  const [currentVerb, setCurrentVerb] = useState<any>(null);
-  const [targetForm, setTargetForm] = useState<'pastSimple'|'pastParticiple'>('pastSimple');
+  const [connected, setConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+  const inputAudioCtxRef = useRef<AudioContext | null>(null);
+  const outputAudioCtxRef = useRef<AudioContext | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
-  const startNewQuestion = () => {
-    const randomVerb = allVerbs[Math.floor(Math.random() * allVerbs.length)];
-    const form = Math.random() > 0.5 ? 'pastSimple' : 'pastParticiple';
-    setCurrentVerb(randomVerb);
-    setTargetForm(form);
-    
-    setMessages(prev => [
-      ...prev, 
-      { sender: 'bot', text: `What is the ${form === 'pastSimple' ? 'past simple' : 'past participle'} of "${randomVerb.base}" (${randomVerb.translation})?` }
-    ]);
+  const startLive = async () => {
+    try {
+      setConnecting(true);
+      setError(null);
+
+      // We need standard HTTP/WS detection
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/live`;
+      
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      const inputAudioCtx = new AudioContext({ sampleRate: 16000 });
+      inputAudioCtxRef.current = inputAudioCtx;
+      
+      const outputAudioCtx = new AudioContext({ sampleRate: 24000 });
+      outputAudioCtxRef.current = outputAudioCtx;
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const source = inputAudioCtx.createMediaStreamSource(stream);
+      sourceRef.current = source;
+      
+      const processor = inputAudioCtx.createScriptProcessor(4096, 1, 1);
+      processorRef.current = processor;
+      
+      source.connect(processor);
+      processor.connect(inputAudioCtx.destination);
+
+      processor.onaudioprocess = (e) => {
+        if (ws.readyState === WebSocket.OPEN) {
+          const base64 = pcmToBase64(e.inputBuffer.getChannelData(0));
+          ws.send(JSON.stringify({ audio: base64 }));
+        }
+      };
+
+      ws.onopen = () => {
+        setConnected(true);
+        setConnecting(false);
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.audio) {
+          playAudioChunk(outputAudioCtx, msg.audio);
+        }
+        if (msg.interrupted) {
+          resetAudioQueue();
+        }
+      };
+
+      ws.onerror = (e) => {
+        console.error("WebSocket error", e);
+        setError("Connection error. Ensure the backend server is running.");
+        stopLive();
+      };
+      
+      ws.onclose = () => {
+        stopLive();
+      };
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to start microphone or connect to server.");
+      stopLive();
+    }
+  };
+
+  const stopLive = () => {
+    if (processorRef.current) {
+      processorRef.current.disconnect();
+      processorRef.current = null;
+    }
+    if (sourceRef.current) {
+      sourceRef.current.disconnect();
+      sourceRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (inputAudioCtxRef.current) {
+      inputAudioCtxRef.current.close();
+      inputAudioCtxRef.current = null;
+    }
+    if (outputAudioCtxRef.current) {
+      outputAudioCtxRef.current.close();
+      outputAudioCtxRef.current = null;
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    resetAudioQueue();
+    setConnected(false);
+    setConnecting(false);
   };
 
   useEffect(() => {
-    // Initial load
-    setMessages([{ sender: 'bot', text: 'Hi! Let\'s practice some verbs together. 🚀' }]);
-    setTimeout(() => {
-      startNewQuestion();
-    }, 1000);
+    return () => {
+      stopLive();
+    };
   }, []);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || !currentVerb) return;
-    
-    const userText = input.trim();
-    setMessages(prev => [...prev, { sender: 'user', text: userText }]);
-    setInput('');
-    
-    const expectedStr = targetForm === 'pastSimple' ? currentVerb.pastSimple : currentVerb.pastParticiple;
-    const acceptedAnswers = expectedStr.split(',').map((s: string) => s.trim().toLowerCase());
-    
-    setTimeout(() => {
-      if (acceptedAnswers.includes(userText.toLowerCase())) {
-        updateVerbMastery(currentVerb.base, 'mastered');
-        addXp(5);
-        setMessages(prev => [...prev, { sender: 'bot', text: `Spot on! "${expectedStr}" is correct. (+5 XP)` }]);
-        setTimeout(() => startNewQuestion(), 1000);
-      } else {
-        updateVerbMastery(currentVerb.base, 'learning');
-        setMessages(prev => [...prev, { sender: 'bot', text: `Not quite! The correct answer was "${expectedStr}". Let's try another one.` }]);
-        setTimeout(() => startNewQuestion(), 1500);
-      }
-    }, 600);
-  };
-
   return (
-    <main className="flex-grow w-full max-w-2xl mx-auto flex flex-col relative pb-[80px] md:pb-0 h-[calc(100vh-72px)]">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-margin-mobile flex flex-col gap-4 scroll-smooth">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-[24px] px-5 py-3.5 font-body-md leading-relaxed ${
-              m.sender === 'user' 
-                ? 'bg-primary text-on-primary rounded-br-md shadow-[0_4px_12px_rgba(0,0,0,0.08)]' 
-                : 'bg-surface-variant/30 text-on-surface rounded-bl-md'
-            }`}>
-              {m.text}
-            </div>
-          </div>
-        ))}
+    <main className="flex-grow w-full max-w-2xl mx-auto flex flex-col items-center justify-center p-8 gap-8 pb-[100px] md:pb-8">
+      <div className="text-center space-y-4">
+        <h2 className="text-headline-md font-display-verb text-primary">Speak</h2>
+        <p className="text-body-lg text-on-surface-variant max-w-md mx-auto">
+          Practice your spoken English with VerbMaster. Tap the button and start speaking!
+        </p>
       </div>
-      
-      <form onSubmit={handleSend} className="bg-surface/90 backdrop-blur-sm border-t border-surface-variant p-4 flex gap-2 w-full shrink-0">
-        <input 
-          type="text" 
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Type your answer..."
-          className="flex-1 h-12 rounded-xl bg-surface-container-lowest border-2 border-outline-variant px-4 focus:border-primary focus:ring-0 outline-none"
-          autoFocus
-          autoComplete="off"
-        />
-        <button type="submit" disabled={!currentVerb} className="h-12 px-6 bg-primary text-on-primary font-label-bold rounded-xl btn-physical border-on-primary-fixed-variant disabled:opacity-50">
-          Send
+
+      {error && (
+        <div className="bg-error-container text-on-error-container p-4 rounded-xl max-w-md w-full text-center">
+          {error}
+        </div>
+      )}
+
+      <div className="flex flex-col items-center justify-center gap-6 mt-8">
+        <button
+          onClick={connected ? stopLive : startLive}
+          disabled={connecting}
+          className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
+            connected 
+              ? 'bg-error text-on-error scale-110 animate-pulse border-4 border-error-container shadow-error/30' 
+              : 'bg-primary text-on-primary hover:scale-105 border-4 border-primary-container shadow-primary/30'
+          } ${connecting ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <span className="material-symbols-outlined text-[48px]" style={{fontVariationSettings: "'FILL' 1"}}>
+            {connected ? 'stop' : (connecting ? 'hourglass_empty' : 'mic')}
+          </span>
         </button>
-      </form>
+        
+        <div className="text-label-lg font-label-bold text-on-surface-variant h-8">
+          {connecting ? 'Connecting...' : (connected ? 'VerbMaster is listening...' : 'Tap to speak')}
+        </div>
+      </div>
     </main>
   );
 }

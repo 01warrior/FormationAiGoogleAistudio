@@ -74,10 +74,10 @@ export default function App() {
         {/* Desktop SideNav */}
         <aside className="hidden md:flex flex-col w-64 border-r-4 border-surface-variant p-stack-md gap-stack-md h-[calc(100vh-72px)] sticky top-[72px]">
           <NavItem tab="home" icon="home" label="Home" activeTab={activeTab} onClick={setActiveTab} />
+          <NavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="verbs" icon="menu_book" label="Verbs" activeTab={activeTab} onClick={setActiveTab} />
-          <NavItem tab="chat" icon="forum" label="Chat" activeTab={activeTab} onClick={setActiveTab} />
         </aside>
 
         {/* Main Content Area */}
@@ -87,10 +87,10 @@ export default function App() {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 w-full z-40 rounded-t-xl bg-surface border-t-4 border-surface-variant flex justify-around items-center h-[80px] pb-safe px-2 shadow-[0_-4px_16px_rgba(0,0,0,0.05)]">
         <MobileNavItem tab="home" icon="home" label="Home" activeTab={activeTab} onClick={setActiveTab} />
+        <MobileNavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="verbs" icon="menu_book" label="Verbs" activeTab={activeTab} onClick={setActiveTab} />
-        <MobileNavItem tab="chat" icon="forum" label="Chat" activeTab={activeTab} onClick={setActiveTab} />
       </nav>
       <InstallPrompt />
     </div>
