@@ -100,7 +100,7 @@ export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
             You are {progressPercent}% of the way to mastering irregular verbs!
           </p>
           
-          <button onClick={onStartLearning} className="w-full md:w-auto h-14 bg-primary text-on-primary font-label-bold text-label-bold px-8 rounded-xl border-primary-fixed-dim shadow-md hover:brightness-110 active:brightness-95 btn-physical mt-stack-sm flex items-center justify-center gap-2">
+          <button onClick={onStartLearning} className="w-full md:w-auto h-14 bg-primary border-b-4 border-primary-fixed-dim text-on-primary font-label-bold text-label-bold px-8 rounded-xl active:translate-y-[2px] active:border-b-2 transition-all shadow-sm hover:brightness-110 mt-stack-sm flex items-center justify-center gap-2">
             <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>play_arrow</span>
             Start Learning
           </button>
