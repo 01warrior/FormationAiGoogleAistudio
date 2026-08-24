@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore, allVerbs, lessons } from './store';
-import { playSuccessSound, playErrorSound } from './audio';
+import { playSuccessSound, playErrorSound, speakWord } from './audio';
 
 export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: () => void }) {
   const { addXp, updateVerbMastery, completeLesson } = useAppStore();
@@ -142,6 +142,15 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
               <div className="font-headline-lg-mobile text-headline-lg-mobile text-primary capitalize">{currentVerb.base} <span className="font-body-md text-body-md text-outline font-normal">({currentVerb.translation})</span></div>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={() => speakWord(currentVerb.base)}
+            className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container text-primary flex items-center justify-center border-2 border-surface-variant transition-colors"
+            title="Pronounce infinitive"
+            aria-label="Pronounce infinitive"
+          >
+            <span className="material-symbols-outlined text-[20px]">volume_up</span>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-surface border border-surface-variant card-plate rounded-2xl p-stack-lg shadow-sm flex flex-col gap-stack-lg flex-1">

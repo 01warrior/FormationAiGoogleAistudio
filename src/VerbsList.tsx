@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import { allVerbs, useAppStore } from './store';
+import { speakVerbTrio } from './audio';
 
 export function VerbsList() {
   const { state } = useAppStore();
   const [filter, setFilter] = useState<'all' | 'toLearn' | 'mastered'>('all');
   const [search, setSearch] = useState('');
+  const [playingBase, setPlayingBase] = useState<string | null>(null);
+
+  const handlePlayVerb = (v: typeof allVerbs[0], e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPlayingBase(v.base);
+    speakVerbTrio(v.base, v.pastSimple, v.pastParticiple);
+    setTimeout(() => setPlayingBase(null), 2500);
+  };
 
   const filteredVerbs = allVerbs.filter(v => {
     const isMatch = v.base.includes(search.toLowerCase()) || v.translation.includes(search.toLowerCase());
@@ -50,7 +59,11 @@ export function VerbsList() {
         {filteredVerbs.map(v => {
           const level = (state.verbProgress || {})[v.base]?.level || 'unseen';
           return (
-            <article key={v.base} className="w-full bg-surface-container-lowest rounded-xl border-2 border-surface-variant border-b-4 shadow-sm p-stack-md flex flex-col gap-gutter active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer relative overflow-hidden group">
+            <article 
+              key={v.base} 
+              onClick={(e) => handlePlayVerb(v, e)}
+              className="w-full bg-surface-container-lowest rounded-xl border-2 border-surface-variant border-b-4 shadow-sm p-stack-md flex flex-col gap-gutter active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer relative overflow-hidden group"
+            >
               <div className="flex justify-between items-start">
                 <div className="flex flex-col gap-base z-10">
                   <div className="flex items-center gap-gutter">
@@ -62,14 +75,30 @@ export function VerbsList() {
                   <p className="font-body-md text-body-md text-on-surface-variant italic">{v.translation}</p>
                 </div>
                 
-                {level === 'learning' && (
-                  <div className="w-12 h-3 bg-surface-variant rounded-full overflow-hidden self-center z-10">
-                    <div className="h-full bg-secondary-container w-[50%] rounded-full"></div>
-                  </div>
-                )}
-                {level === 'unseen' && (
-                  <div className="w-12 h-3 bg-surface-variant rounded-full overflow-hidden self-center z-10"></div>
-                )}
+                <div className="flex items-center gap-2 z-10">
+                  <button
+                    type="button"
+                    onClick={(e) => handlePlayVerb(v, e)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
+                      playingBase === v.base
+                        ? 'bg-primary text-on-primary border-primary scale-110 shadow-sm'
+                        : 'bg-surface-container hover:bg-primary-container hover:text-on-primary-container border-surface-variant text-on-surface-variant'
+                    }`}
+                    title="Pronounce all 3 forms"
+                    aria-label="Pronounce verb"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">volume_up</span>
+                  </button>
+
+                  {level === 'learning' && (
+                    <div className="w-10 h-2.5 bg-surface-variant rounded-full overflow-hidden self-center">
+                      <div className="h-full bg-secondary-container w-[50%] rounded-full"></div>
+                    </div>
+                  )}
+                  {level === 'unseen' && (
+                    <div className="w-10 h-2.5 bg-surface-variant rounded-full overflow-hidden self-center"></div>
+                  )}
+                </div>
               </div>
               
               {level === 'mastered' && (
