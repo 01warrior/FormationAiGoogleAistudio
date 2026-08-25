@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useAppStore, allVerbs } from './store';
+import { categories, CategoryId } from './vocabData';
 
 export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
-  const { state, setDailyGoal } = useAppStore();
-  const [showGoalDialog, setShowGoalDialog] = useState(false);
-  const [tempGoal, setTempGoal] = useState(state.dailyGoal);
+  const { state, setDailyGoal, setActiveCategory, setAudioSpeed } = useAppStore();
   
   const totalMastered = Object.values(state.verbProgress || {}).filter((v: any) => v.level === 'mastered').length;
   const totalVerbs = allVerbs.length;
@@ -18,65 +17,37 @@ export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
     .map(([base]) => allVerbs.find(v => v.base === base))
     .filter(Boolean);
 
-  const openGoalDialog = () => {
-    setTempGoal(state.dailyGoal);
-    setShowGoalDialog(true);
-  };
-
-  const saveGoal = () => {
-    setDailyGoal(tempGoal);
-    setShowGoalDialog(false);
-  };
-
   return (
-    <div className="flex-grow flex flex-col md:flex-row md:max-w-6xl md:mx-auto w-full gap-stack-lg p-margin-mobile pb-[100px]">
+    <div className="flex-grow flex flex-col max-w-4xl mx-auto w-full gap-stack-lg p-margin-mobile pb-[100px]">
       
-      {showGoalDialog && (
-        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 animate-pop-in">
-          <div className="bg-surface-container-lowest w-full max-w-sm rounded-[32px] border-4 border-surface-variant p-stack-lg shadow-xl flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mb-4 text-primary">
-              <span className="material-symbols-outlined text-[32px]" style={{fontVariationSettings: "'FILL' 1"}}>flag</span>
-            </div>
-            <h2 className="font-headline-lg-mobile text-on-surface mb-2">Set Daily Goal</h2>
-            <p className="font-body-md text-on-surface-variant mb-6">
-              How many lessons do you want to complete each day?
-            </p>
-
-            <div className="flex items-center gap-6 mb-8">
-              <button 
-                onClick={() => setTempGoal(Math.max(1, tempGoal - 1))}
-                className="w-12 h-12 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-variant active:scale-95 transition-transform"
-              >
-                <span className="material-symbols-outlined text-[28px]">remove</span>
-              </button>
-              <span className="font-display-verb text-[40px] text-on-surface w-12 text-center">{tempGoal}</span>
-              <button 
-                onClick={() => setTempGoal(Math.min(10, tempGoal + 1))}
-                className="w-12 h-12 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-variant active:scale-95 transition-transform"
-              >
-                <span className="material-symbols-outlined text-[28px]">add</span>
-              </button>
-            </div>
-
-            <div className="flex gap-4 w-full">
-              <button 
-                onClick={() => setShowGoalDialog(false)}
-                className="flex-1 h-12 bg-surface-container-low border-2 border-surface-variant border-b-4 text-on-surface font-label-bold rounded-xl active:translate-y-[2px] active:border-b-2 transition-all"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={saveGoal}
-                className="flex-1 h-12 bg-primary border-b-4 border-primary-fixed-dim text-on-primary font-label-bold rounded-xl active:translate-y-[2px] active:border-b-2 transition-all"
-              >
-                Save
-              </button>
-            </div>
+      <div className="flex flex-col gap-stack-lg w-full">
+        {/* Categories Section */}
+        <section className="flex flex-col gap-3">
+          <h2 className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider pl-1">Decks / Themes</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {categories.map((cat) => {
+              const isActive = state.activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`p-3 sm:p-4 rounded-2xl border-4 text-left transition-all active:scale-95 flex flex-col gap-2 ${
+                    isActive
+                      ? `border-primary bg-primary-container text-on-primary-container shadow-md`
+                      : `border-surface-variant bg-surface-container hover:bg-surface-container-high`
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${cat.colorClass}`}>
+                    <span className="material-symbols-outlined">{cat.icon}</span>
+                  </div>
+                  <h3 className="font-label-bold text-sm mt-1 leading-tight">{cat.title}</h3>
+                  <p className="text-[11px] opacity-80 leading-snug">{cat.description}</p>
+                </button>
+              );
+            })}
           </div>
-        </div>
-      )}
+        </section>
 
-      <div className="flex flex-col gap-stack-lg w-full md:w-2/3">
         <section className="plate rounded-xl p-stack-lg flex flex-col items-center text-center gap-stack-md shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary-fixed opacity-30 rounded-full blur-3xl -z-10"></div>
           
@@ -110,13 +81,6 @@ export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
         <section className="plate rounded-xl p-stack-md flex flex-col gap-stack-sm">
           <div className="flex items-center justify-between">
             <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider">Daily Goal</h3>
-            <button 
-              onClick={openGoalDialog}
-              className="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center hover:bg-surface-variant active:scale-95 transition-transform"
-              aria-label="Edit daily goal"
-            >
-              <span className="material-symbols-outlined text-[20px]">edit</span>
-            </button>
           </div>
           
           <div className="flex items-center justify-between text-sm mt-2 mb-1">
@@ -153,9 +117,8 @@ export function Home({ onStartLearning }: { onStartLearning?: () => void }) {
             <span className="font-label-bold text-label-bold text-on-surface-variant">Earned Today</span>
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-stack-lg w-full md:w-1/3">
+        {/* Recent Mastery Section */}
         <section className="plate rounded-xl p-stack-md flex flex-col gap-stack-md">
           <div className="flex items-center justify-between">
             <h3 className="font-headline-lg-mobile text-on-surface">Recent Mastery</h3>

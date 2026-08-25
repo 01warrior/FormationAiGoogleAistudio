@@ -15,15 +15,20 @@ export interface UserVerbProgress {
   xp: number;
 }
 
+import { CategoryId } from './vocabData';
+
 export interface UserState {
   streak: number;
   lastActive: string | null;
   xp: number;
   verbProgress: Record<string, UserVerbProgress>; // key is base verb
+  vocabProgress: Record<string, UserVerbProgress>; // key is vocab id
+  activeCategory: CategoryId;
   completedLessons: string[];
   dailyGoal: number;
   lessonsCompletedToday: number;
   lastLessonDate: string | null;
+  audioSpeed: number;
 }
 
 export interface Lesson {
@@ -55,10 +60,13 @@ const DEFAULT_STATE: UserState = {
   lastActive: new Date().toISOString(),
   xp: 0,
   verbProgress: {},
+  vocabProgress: {},
+  activeCategory: 'irregular_verbs',
   completedLessons: [],
   dailyGoal: 1,
   lessonsCompletedToday: 0,
   lastLessonDate: null,
+  audioSpeed: 1.0,
 };
 
 function isToday(dateString: string | null) {
@@ -82,11 +90,14 @@ if (saved) {
       ...DEFAULT_STATE, 
       ...parsed,
       verbProgress: parsed.verbProgress || {},
+      vocabProgress: parsed.vocabProgress || {},
+      activeCategory: parsed.activeCategory || 'irregular_verbs',
       completedLessons: parsed.completedLessons || [],
       xp: parsed.xp || 0,
       dailyGoal: parsed.dailyGoal || 1,
       lessonsCompletedToday: parsed.lessonsCompletedToday || 0,
-      lastLessonDate: parsed.lastLessonDate || null
+      lastLessonDate: parsed.lastLessonDate || null,
+      audioSpeed: parsed.audioSpeed || 1.0
     };
     // Calculate streak
     const lastActiveDate = new Date(globalState.lastActive || new Date());
@@ -153,8 +164,30 @@ export function useAppStore() {
     }));
   };
   
+  const updateVocabMastery = (id: string, level: MasteryLevel) => {
+    setGlobalState(s => ({
+      ...s,
+      vocabProgress: {
+        ...s.vocabProgress,
+        [id]: {
+          ...s.vocabProgress[id],
+          level,
+          xp: (s.vocabProgress[id]?.xp || 0) + (level === 'mastered' ? 10 : 5)
+        }
+      }
+    }));
+  };
+
+  const setActiveCategory = (categoryId: import('./vocabData').CategoryId) => {
+    setGlobalState(s => ({ ...s, activeCategory: categoryId }));
+  };
+  
   const setDailyGoal = (goal: number) => {
     setGlobalState(s => ({ ...s, dailyGoal: Math.max(1, goal) }));
+  };
+
+  const setAudioSpeed = (audioSpeed: number) => {
+    setGlobalState(s => ({ ...s, audioSpeed }));
   };
 
   const completeLesson = (id: string) => {
@@ -176,5 +209,5 @@ export function useAppStore() {
     });
   }
 
-  return { state, addXp, updateVerbMastery, completeLesson, setDailyGoal };
+  return { state, addXp, updateVerbMastery, updateVocabMastery, completeLesson, setDailyGoal, setActiveCategory, setAudioSpeed };
 }

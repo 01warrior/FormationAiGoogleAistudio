@@ -75,7 +75,7 @@ export function speakWord(text: string, lang: string = 'en-US', rate: number = 0
   }
 }
 
-export function speakVerbTrio(base: string, pastSimple: string, pastParticiple: string) {
+export function speakVerbTrio(base: string, pastSimple: string, pastParticiple: string, rate: number = 0.85) {
   const fullSentence = `${base}... ${pastSimple.replace(/,/g, ' or ')}... ${pastParticiple.replace(/,/g, ' or ')}`;
-  speakWord(fullSentence, 'en-US', 0.8);
+  speakWord(fullSentence, 'en-US', rate);
 }

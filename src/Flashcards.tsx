@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { allVerbs, useAppStore } from './store';
+import { vocabData } from './vocabData';
 import { speakWord, speakVerbTrio } from './audio';
 
 export function Flashcards() {
-  const { state, updateVerbMastery, addXp } = useAppStore();
+  const { state, updateVerbMastery, updateVocabMastery, addXp } = useAppStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [speakingField, setSpeakingField] = useState<string | null>(null);
 
-  // Focus on verbs not yet mastered
-  let verbsToLearn = allVerbs.filter(v => (state.verbProgress || {})[v.base]?.level !== 'mastered');
-  // Fallback if user mastered everything
-  if (verbsToLearn.length === 0) {
-    verbsToLearn = allVerbs;
+  const isVocabMode = state.activeCategory !== 'irregular_verbs';
+
+  // Get items based on mode
+  let itemsToLearn: any[] = [];
+  if (isVocabMode) {
+    itemsToLearn = vocabData.filter(v => v.categoryId === state.activeCategory);
+    itemsToLearn = itemsToLearn.filter(v => (state.vocabProgress || {})[v.id]?.level !== 'mastered');
+    if (itemsToLearn.length === 0) {
+      itemsToLearn = vocabData.filter(v => v.categoryId === state.activeCategory);
+    }
+  } else {
+    itemsToLearn = allVerbs.filter(v => (state.verbProgress || {})[v.base]?.level !== 'mastered');
+    if (itemsToLearn.length === 0) {
+      itemsToLearn = allVerbs;
+    }
   }
 
-  const currentVerb = verbsToLearn[currentIndex % verbsToLearn.length];
+  const currentItem = itemsToLearn[currentIndex % itemsToLearn.length];
 
   const handleNext = () => {
     setIsFlipped(false);
@@ -27,7 +38,7 @@ export function Flashcards() {
   const handleSpeak = (text: string, fieldId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setSpeakingField(fieldId);
-    speakWord(text);
+    speakWord(text, 'en-US', state.audioSpeed);
     setTimeout(() => {
       setSpeakingField(null);
     }, 1200);
@@ -35,9 +46,9 @@ export function Flashcards() {
 
   const handleSpeakAll = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (!currentVerb) return;
+    if (!currentItem || isVocabMode) return;
     setSpeakingField('all');
-    speakVerbTrio(currentVerb.base, currentVerb.pastSimple, currentVerb.pastParticiple);
+    speakVerbTrio(currentItem.base, currentItem.pastSimple, currentItem.pastParticiple, state.audioSpeed);
     setTimeout(() => {
       setSpeakingField(null);
     }, 2500);
@@ -45,8 +56,12 @@ export function Flashcards() {
 
   const handleKnowIt = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (currentVerb) {
-      updateVerbMastery(currentVerb.base, 'mastered');
+    if (currentItem) {
+      if (isVocabMode) {
+        updateVocabMastery(currentItem.id, 'mastered');
+      } else {
+        updateVerbMastery(currentItem.base, 'mastered');
+      }
       addXp(5);
     }
     handleNext();
@@ -54,20 +69,28 @@ export function Flashcards() {
 
   const handleReviewLater = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (currentVerb) {
-      updateVerbMastery(currentVerb.base, 'learning');
+    if (currentItem) {
+      if (isVocabMode) {
+        updateVocabMastery(currentItem.id, 'learning');
+      } else {
+        updateVerbMastery(currentItem.base, 'learning');
+      }
     }
     handleNext();
   };
 
-  if (!currentVerb) return null;
+  if (!currentItem) return (
+    <div className="flex-grow flex items-center justify-center">
+      <p className="text-on-surface-variant font-label-bold">No cards available for this category.</p>
+    </div>
+  );
 
   return (
     <main className="flex-grow flex flex-col items-center justify-center p-margin-mobile pb-[100px] md:pb-margin-mobile relative w-full max-w-2xl mx-auto">
       <div className="w-full flex flex-col items-center mb-stack-lg px-4 justify-center">
         <h2 className="font-label-bold text-on-surface-variant mb-2">Card {currentIndex + 1}</h2>
         <div className="h-2 w-full max-w-xs bg-surface-variant rounded-full overflow-hidden">
-          <div className="h-full bg-tertiary-container rounded-full transition-all duration-300" style={{width: `${((currentIndex % verbsToLearn.length + 1) / verbsToLearn.length) * 100}%`}}></div>
+          <div className="h-full bg-tertiary-container rounded-full transition-all duration-300" style={{width: `${((currentIndex % itemsToLearn.length + 1) / itemsToLearn.length) * 100}%`}}></div>
         </div>
       </div>
 
@@ -80,30 +103,30 @@ export function Flashcards() {
           <div className="absolute inset-0 w-full h-full backface-hidden bg-surface-container-lowest border-4 border-surface-variant rounded-[32px] flex flex-col items-center justify-between p-8 border-b-8 shadow-sm active:border-b-4 active:translate-y-1 transition-all">
             <div className="w-full flex justify-between items-center">
               <span className="font-label-bold text-label-bold text-outline rounded-full bg-surface px-3.5 py-1.5 text-xs">
-                Infinitive
+                {isVocabMode ? 'English' : 'Infinitive'}
               </span>
               <button
                 type="button"
-                onClick={(e) => handleSpeak(currentVerb.base, 'front-base', e)}
+                onClick={(e) => handleSpeak(isVocabMode ? currentItem.english : currentItem.base, 'front-base', e)}
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 border-surface-variant transition-all ${
                   speakingField === 'front-base' 
                     ? 'bg-primary text-on-primary scale-110 shadow-md' 
                     : 'bg-surface-container hover:bg-primary-container hover:text-on-primary-container text-primary'
                 }`}
-                title="Pronounce verb"
-                aria-label="Pronounce verb"
+                title="Pronounce"
+                aria-label="Pronounce"
               >
                 <span className="material-symbols-outlined text-[22px]">volume_up</span>
               </button>
             </div>
 
             <div className="flex flex-col items-center justify-center my-auto text-center">
-              <span className="font-display-verb text-display-verb text-primary capitalize mb-2">
-                {currentVerb.base}
+              <span className="font-display-verb text-[36px] text-primary capitalize mb-2 leading-tight">
+                {isVocabMode ? currentItem.english : currentItem.base}
               </span>
               <button
                 type="button"
-                onClick={(e) => handleSpeak(currentVerb.base, 'front-listen-btn', e)}
+                onClick={(e) => handleSpeak(isVocabMode ? currentItem.english : currentItem.base, 'front-listen-btn', e)}
                 className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary-container/15 text-primary text-sm font-label-bold hover:bg-primary-container/25 transition-colors"
               >
                 <span className="material-symbols-outlined text-[18px]">volume_up</span>
@@ -118,80 +141,109 @@ export function Flashcards() {
 
           {/* Back */}
           <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-surface-container-lowest border-4 border-primary rounded-[32px] flex flex-col items-center justify-between p-6 border-b-8 shadow-sm">
-            {/* Top header with Speak all */}
-            <div className="w-full flex justify-between items-center">
-              <span className="font-label-bold text-xs text-primary rounded-full bg-primary-fixed px-3 py-1">
-                Conjugations
-              </span>
-              <button
-                type="button"
-                onClick={handleSpeakAll}
-                className={`flex items-center gap-1.5 text-xs font-label-bold px-3 py-1.5 rounded-full border-2 transition-all ${
-                  speakingField === 'all'
-                    ? 'bg-primary text-on-primary border-primary shadow-sm scale-105'
-                    : 'bg-surface border-surface-variant text-primary hover:bg-primary-container hover:text-on-primary-container'
-                }`}
-                title="Listen to all 3 forms in sequence"
-              >
-                <span className="material-symbols-outlined text-[16px]">record_voice_over</span>
-                Listen All (3)
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center gap-2.5 w-full my-auto">
-              {/* Base */}
-              <div className="flex items-center justify-between bg-primary-container text-on-primary-container font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-primary capitalize">
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] uppercase opacity-80 font-sans tracking-wider">Infinitive</span>
-                  <span>{currentVerb.base}</span>
+            {isVocabMode ? (
+              // Vocab Back Side
+              <div className="flex flex-col items-center w-full h-full justify-between">
+                <span className="font-label-bold text-xs text-primary rounded-full bg-primary-fixed px-3 py-1 self-start">
+                  Translation
+                </span>
+                
+                <div className="flex flex-col items-center justify-center text-center w-full flex-grow">
+                  <span className="font-display-verb text-[32px] text-secondary-container capitalize mb-4">
+                    {currentItem.french}
+                  </span>
+                  
+                  <div className="w-full bg-surface-variant rounded-xl p-4 mt-4 border-l-4 border-primary text-left flex flex-col gap-2">
+                    <span className="text-[10px] uppercase font-label-bold text-on-surface-variant">Example (English)</span>
+                    <p className="font-body-md text-on-surface leading-snug">"{currentItem.example}"</p>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSpeak(currentItem.example, 'back-example', e)}
+                      className="self-end mt-1 text-primary flex items-center gap-1 text-xs font-label-bold hover:underline"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">volume_up</span> Listen
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={(e) => handleSpeak(currentVerb.base, 'back-base', e)}
-                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-on-primary-container flex items-center justify-center transition-colors"
-                  title="Pronounce infinitive"
-                >
-                  <span className="material-symbols-outlined text-[18px]">volume_up</span>
-                </button>
               </div>
-
-              {/* Past Simple */}
-              <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Simple (Prétérit)</span>
-                  <span>{currentVerb.pastSimple}</span>
+            ) : (
+              // Verbs Back Side
+              <>
+                <div className="w-full flex justify-between items-center">
+                  <span className="font-label-bold text-xs text-primary rounded-full bg-primary-fixed px-3 py-1">
+                    Conjugations
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleSpeakAll}
+                    className={`flex items-center gap-1.5 text-xs font-label-bold px-3 py-1.5 rounded-full border-2 transition-all ${
+                      speakingField === 'all'
+                        ? 'bg-primary text-on-primary border-primary shadow-sm scale-105'
+                        : 'bg-surface border-surface-variant text-primary hover:bg-primary-container hover:text-on-primary-container'
+                    }`}
+                    title="Listen to all 3 forms in sequence"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">record_voice_over</span>
+                    Listen All (3)
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={(e) => handleSpeak(currentVerb.pastSimple, 'back-past', e)}
-                  className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary-container text-on-surface flex items-center justify-center transition-colors"
-                  title="Pronounce past simple"
-                >
-                  <span className="material-symbols-outlined text-[18px]">volume_up</span>
-                </button>
-              </div>
 
-              {/* Past Participle */}
-              <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
-                <div className="flex flex-col text-left">
-                  <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Participle</span>
-                  <span>{currentVerb.pastParticiple}</span>
+                <div className="flex flex-col items-center gap-2.5 w-full my-auto">
+                  {/* Base */}
+                  <div className="flex items-center justify-between bg-primary-container text-on-primary-container font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-primary capitalize">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] uppercase opacity-80 font-sans tracking-wider">Infinitive</span>
+                      <span>{currentItem.base}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSpeak(currentItem.base, 'back-base', e)}
+                      className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-on-primary-container flex items-center justify-center transition-colors"
+                      title="Pronounce infinitive"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">volume_up</span>
+                    </button>
+                  </div>
+
+                  {/* Past Simple */}
+                  <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Simple (Prétérit)</span>
+                      <span>{currentItem.pastSimple}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSpeak(currentItem.pastSimple, 'back-past', e)}
+                      className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary-container text-on-surface flex items-center justify-center transition-colors"
+                      title="Pronounce past simple"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">volume_up</span>
+                    </button>
+                  </div>
+
+                  {/* Past Participle */}
+                  <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Participle</span>
+                      <span>{currentItem.pastParticiple}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => handleSpeak(currentItem.pastParticiple, 'back-participle', e)}
+                      className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary-container text-on-surface flex items-center justify-center transition-colors"
+                      title="Pronounce past participle"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">volume_up</span>
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={(e) => handleSpeak(currentVerb.pastParticiple, 'back-participle', e)}
-                  className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-primary-container hover:text-on-primary-container text-on-surface flex items-center justify-center transition-colors"
-                  title="Pronounce past participle"
-                >
-                  <span className="material-symbols-outlined text-[18px]">volume_up</span>
-                </button>
-              </div>
-            </div>
-            
-            <div className="text-center w-full pt-2 border-t-2 border-surface-variant">
-              <span className="block font-label-bold text-xs text-outline mb-0.5">Translation (French)</span>
-              <span className="font-headline-lg-mobile text-headline-lg-mobile text-secondary-container capitalize">{currentVerb.translation}</span>
-            </div>
+                
+                <div className="text-center w-full pt-2 border-t-2 border-surface-variant">
+                  <span className="block font-label-bold text-xs text-outline mb-0.5">Translation (French)</span>
+                  <span className="font-headline-lg-mobile text-headline-lg-mobile text-secondary-container capitalize">{currentItem.translation}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

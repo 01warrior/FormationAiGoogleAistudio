@@ -1,25 +1,48 @@
 import React, { useState } from 'react';
 import { allVerbs, useAppStore } from './store';
-import { speakVerbTrio } from './audio';
+import { vocabData } from './vocabData';
+import { speakVerbTrio, speakWord } from './audio';
 
 export function VerbsList() {
   const { state } = useAppStore();
   const [filter, setFilter] = useState<'all' | 'toLearn' | 'mastered'>('all');
   const [search, setSearch] = useState('');
-  const [playingBase, setPlayingBase] = useState<string | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
-  const handlePlayVerb = (v: typeof allVerbs[0], e: React.MouseEvent) => {
+  const isVocabMode = state.activeCategory !== 'irregular_verbs';
+
+  let itemsToDisplay: any[] = [];
+
+  if (isVocabMode) {
+    itemsToDisplay = vocabData.filter(v => v.categoryId === state.activeCategory);
+  } else {
+    itemsToDisplay = allVerbs;
+  }
+
+  const handlePlayVocab = (v: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    setPlayingBase(v.base);
-    speakVerbTrio(v.base, v.pastSimple, v.pastParticiple);
-    setTimeout(() => setPlayingBase(null), 2500);
+    const idToPlay = isVocabMode ? v.id : v.base;
+    setPlayingId(idToPlay);
+    if (isVocabMode) {
+      speakWord(v.english, 'en-US', state.audioSpeed);
+      setTimeout(() => setPlayingId(null), 1500);
+    } else {
+      speakVerbTrio(v.base, v.pastSimple, v.pastParticiple, state.audioSpeed);
+      setTimeout(() => setPlayingId(null), 2500);
+    }
   };
 
-  const filteredVerbs = allVerbs.filter(v => {
-    const isMatch = v.base.includes(search.toLowerCase()) || v.translation.includes(search.toLowerCase());
+  const filteredItems = itemsToDisplay.filter(v => {
+    const isMatch = isVocabMode 
+      ? v.english.includes(search.toLowerCase()) || v.french.includes(search.toLowerCase())
+      : v.base.includes(search.toLowerCase()) || v.translation.includes(search.toLowerCase());
+    
     if (!isMatch) return false;
     
-    const progress = (state.verbProgress || {})[v.base]?.level || 'unseen';
+    const progressId = isVocabMode ? v.id : v.base;
+    const progressMap = isVocabMode ? state.vocabProgress : state.verbProgress;
+    const progress = (progressMap || {})[progressId]?.level || 'unseen';
+    
     if (filter === 'mastered') return progress === 'mastered';
     if (filter === 'toLearn') return progress !== 'mastered';
     return true;
@@ -32,7 +55,7 @@ export function VerbsList() {
           <span className="material-symbols-outlined absolute left-gutter top-1/2 -translate-y-1/2 text-outline">search</span>
           <input 
             className="w-full h-full pl-[48px] pr-gutter rounded-xl bg-surface-container-low border-2 border-surface-variant focus:border-primary focus:outline-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline transition-colors shadow-sm" 
-            placeholder="Search verbs..." 
+            placeholder={isVocabMode ? "Search words..." : "Search verbs..."}
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -56,36 +79,46 @@ export function VerbsList() {
       </section>
 
       <section className="flex flex-col gap-stack-md">
-        {filteredVerbs.map(v => {
-          const level = (state.verbProgress || {})[v.base]?.level || 'unseen';
+        {filteredItems.map(v => {
+          const progressId = isVocabMode ? v.id : v.base;
+          const progressMap = isVocabMode ? state.vocabProgress : state.verbProgress;
+          const level = (progressMap || {})[progressId]?.level || 'unseen';
+          
           return (
             <article 
-              key={v.base} 
-              onClick={(e) => handlePlayVerb(v, e)}
+              key={progressId} 
+              onClick={(e) => handlePlayVocab(v, e)}
               className="w-full bg-surface-container-lowest rounded-xl border-2 border-surface-variant border-b-4 shadow-sm p-stack-md flex flex-col gap-gutter active:translate-y-[2px] active:border-b-2 transition-all cursor-pointer relative overflow-hidden group"
             >
               <div className="flex justify-between items-start">
-                <div className="flex flex-col gap-base z-10">
+                <div className="flex flex-col gap-base z-10 w-4/5">
                   <div className="flex items-center gap-gutter">
-                    <h2 className="font-mono-verb text-mono-verb text-on-surface capitalize">{v.base} / {v.pastSimple} / {v.pastParticiple}</h2>
+                    <h2 className={`text-on-surface capitalize ${isVocabMode ? 'font-display-verb text-[20px]' : 'font-mono-verb text-mono-verb'}`}>
+                      {isVocabMode ? v.english : `${v.base} / ${v.pastSimple} / ${v.pastParticiple}`}
+                    </h2>
                     {level === 'mastered' && (
                       <span className="material-symbols-outlined text-tertiary" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
                     )}
                   </div>
-                  <p className="font-body-md text-body-md text-on-surface-variant italic">{v.translation}</p>
+                  <p className="font-body-md text-body-md text-on-surface-variant italic">
+                    {isVocabMode ? v.french : v.translation}
+                  </p>
+                  {isVocabMode && (
+                    <p className="text-xs text-on-surface-variant/70 mt-1 line-clamp-1">{v.example}</p>
+                  )}
                 </div>
                 
                 <div className="flex items-center gap-2 z-10">
                   <button
                     type="button"
-                    onClick={(e) => handlePlayVerb(v, e)}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
-                      playingBase === v.base
+                    onClick={(e) => handlePlayVocab(v, e)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all shrink-0 ${
+                      playingId === progressId
                         ? 'bg-primary text-on-primary border-primary scale-110 shadow-sm'
                         : 'bg-surface-container hover:bg-primary-container hover:text-on-primary-container border-surface-variant text-on-surface-variant'
                     }`}
-                    title="Pronounce all 3 forms"
-                    aria-label="Pronounce verb"
+                    title="Pronounce"
+                    aria-label="Pronounce"
                   >
                     <span className="material-symbols-outlined text-[18px]">volume_up</span>
                   </button>
@@ -107,9 +140,9 @@ export function VerbsList() {
             </article>
           );
         })}
-        {filteredVerbs.length === 0 && (
+        {filteredItems.length === 0 && (
           <div className="text-center p-8 text-on-surface-variant font-body-md">
-            No verbs found.
+            No items found.
           </div>
         )}
       </section>

@@ -1,39 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { useAppStore, allVerbs, lessons } from './store';
+import { useAppStore, allVerbs, Lesson } from './store';
+import { vocabData } from './vocabData';
 import { playSuccessSound, playErrorSound, speakWord } from './audio';
 
-export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: () => void }) {
-  const { addXp, updateVerbMastery, completeLesson } = useAppStore();
-  const lesson = lessons.find(l => l.id === lessonId);
-  const verbs = allVerbs.filter(v => lesson?.verbList.includes(v.base));
+export function LessonSession({ lesson, onBack }: { lesson: Lesson, onBack: () => void }) {
+  const { state, addXp, updateVerbMastery, updateVocabMastery, completeLesson } = useAppStore();
+  const isVocabMode = state.activeCategory !== 'irregular_verbs';
   
-  const [currentVerbIdx, setCurrentVerbIdx] = useState(0);
+  let items: any[] = [];
+  if (isVocabMode) {
+    items = vocabData.filter(v => lesson.verbList.includes(v.id));
+  } else {
+    items = allVerbs.filter(v => lesson.verbList.includes(v.base));
+  }
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [input, setInput] = useState('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  
+  // For verbs mode
   const [targetForm, setTargetForm] = useState<'pastSimple' | 'pastParticiple'>('pastSimple');
+  // For vocab mode
+  const [targetVocabLang, setTargetVocabLang] = useState<'english' | 'french'>('english');
+
   const [isLessonComplete, setIsLessonComplete] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // Randomize the target form on mount and index change
+  // Randomize the target question type on mount and index change
   useEffect(() => {
-    setTargetForm(Math.random() > 0.5 ? 'pastSimple' : 'pastParticiple');
-  }, [currentVerbIdx]);
+    if (isVocabMode) {
+      setTargetVocabLang(Math.random() > 0.5 ? 'english' : 'french');
+    } else {
+      setTargetForm(Math.random() > 0.5 ? 'pastSimple' : 'pastParticiple');
+    }
+  }, [currentIndex, isVocabMode]);
 
-  if (!lesson || verbs.length === 0) return <div onClick={onBack} className="p-8">Error loading lesson...</div>;
+  if (!lesson || items.length === 0) return <div onClick={onBack} className="p-8">Error loading lesson...</div>;
 
-  const currentVerb = verbs[currentVerbIdx];
+  const currentItem = items[currentIndex];
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (isCorrect !== null) {
       // Move to next
-      if (currentVerbIdx < verbs.length - 1) {
-        setCurrentVerbIdx(prev => prev + 1);
+      if (currentIndex < items.length - 1) {
+        setCurrentIndex(prev => prev + 1);
         setInput('');
         setIsCorrect(null);
       } else {
         // Finish lesson
-        completeLesson(lessonId);
+        completeLesson(lesson.id);
         addXp(50);
         setIsLessonComplete(true);
       }
@@ -42,19 +58,33 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
 
     if (!input.trim()) return;
 
-    // Validate logic (handle comma separated answers like "was, were")
-    const expectedStr = targetForm === 'pastSimple' ? currentVerb.pastSimple : currentVerb.pastParticiple;
+    // Validate logic
+    let expectedStr = '';
+    if (isVocabMode) {
+      expectedStr = targetVocabLang === 'english' ? currentItem.english : currentItem.french;
+    } else {
+      expectedStr = targetForm === 'pastSimple' ? currentItem.pastSimple : currentItem.pastParticiple;
+    }
+    
     const acceptedAnswers = expectedStr.split(',').map(s => s.trim().toLowerCase());
     
     if (acceptedAnswers.includes(input.trim().toLowerCase())) {
       setIsCorrect(true);
       playSuccessSound();
-      updateVerbMastery(currentVerb.base, 'mastered');
+      if (isVocabMode) {
+        updateVocabMastery(currentItem.id, 'mastered');
+      } else {
+        updateVerbMastery(currentItem.base, 'mastered');
+      }
       addXp(5); // Mini XP for correct answer
     } else {
       setIsCorrect(false);
       playErrorSound();
-      updateVerbMastery(currentVerb.base, 'learning');
+      if (isVocabMode) {
+        updateVocabMastery(currentItem.id, 'learning');
+      } else {
+        updateVerbMastery(currentItem.base, 'learning');
+      }
     }
   };
 
@@ -85,6 +115,33 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
       </div>
     );
   }
+
+  const promptWord = isVocabMode 
+    ? (targetVocabLang === 'english' ? currentItem.french : currentItem.english)
+    : currentItem.base;
+    
+  const getPromptHtml = () => {
+    if (isVocabMode) {
+      return (
+        <div className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
+          Translate to <span className="font-bold text-primary">{targetVocabLang === 'english' ? 'English' : 'French'}</span>:
+        </div>
+      );
+    } else {
+      return (
+        <div className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
+          Write the <span className="font-bold text-primary">{targetForm === 'pastSimple' ? 'Past Simple' : 'Past Participle'}</span> of <span className="font-bold text-primary">{currentItem.base}</span>:
+        </div>
+      );
+    }
+  };
+
+  const getCorrectAnswer = () => {
+    if (isVocabMode) {
+      return targetVocabLang === 'english' ? currentItem.english : currentItem.french;
+    }
+    return targetForm === 'pastSimple' ? currentItem.pastSimple : currentItem.pastParticiple;
+  };
 
   return (
     <div className="absolute inset-0 bg-background z-50 flex flex-col">
@@ -121,7 +178,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
           <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 0, 'wght' 600"}}>close</span>
         </button>
         <div className="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden flex items-center p-0.5">
-          <div className="h-full bg-secondary-container rounded-full relative transition-all duration-300" style={{ width: `${(currentVerbIdx / verbs.length) * 100}%` }}>
+          <div className="h-full bg-secondary-container rounded-full relative transition-all duration-300" style={{ width: `${(currentIndex / items.length) * 100}%` }}>
             <div className="absolute top-0 left-0 w-full h-1/2 bg-white/30 rounded-t-full"></div>
           </div>
         </div>
@@ -129,7 +186,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
 
       <main className="flex-1 overflow-y-auto px-margin-mobile flex flex-col pb-[120px]">
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-stack-md mb-stack-lg">
-          Complete with the correct form.
+          Complete with the correct word.
         </h1>
         
         <div className="bg-surface-container-low border border-surface-variant card-plate rounded-xl p-stack-md mb-stack-lg flex items-center justify-between">
@@ -138,32 +195,33 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
               <span className="material-symbols-outlined">school</span>
             </div>
             <div>
-              <div className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">Verb to use</div>
-              <div className="font-headline-lg-mobile text-headline-lg-mobile text-primary capitalize">{currentVerb.base} <span className="font-body-md text-body-md text-outline font-normal">({currentVerb.translation})</span></div>
+              <div className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">Target word</div>
+              <div className="font-headline-lg-mobile text-headline-lg-mobile text-primary capitalize">
+                {promptWord} 
+                {!isVocabMode && <span className="font-body-md text-body-md text-outline font-normal"> ({currentItem.translation})</span>}
+              </div>
             </div>
           </div>
           <button
             type="button"
-            onClick={() => speakWord(currentVerb.base)}
+            onClick={() => speakWord(isVocabMode ? (targetVocabLang === 'english' ? currentItem.french : currentItem.english) : currentItem.base, 'en-US', state.audioSpeed)}
             className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary-container text-primary flex items-center justify-center border-2 border-surface-variant transition-colors"
-            title="Pronounce infinitive"
-            aria-label="Pronounce infinitive"
+            title="Pronounce"
+            aria-label="Pronounce"
           >
             <span className="material-symbols-outlined text-[20px]">volume_up</span>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-surface border border-surface-variant card-plate rounded-2xl p-stack-lg shadow-sm flex flex-col gap-stack-lg flex-1">
-          <div className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">
-            Write the <span className="font-bold text-primary">{targetForm === 'pastSimple' ? 'Past Simple' : 'Past Participle'}</span> of <span className="font-bold text-primary">{currentVerb.base}</span>:
-          </div>
+          {getPromptHtml()}
           
           <input 
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isCorrect !== null}
-            className="w-full h-16 rounded-xl bg-surface-container-low border-2 border-surface-variant focus:border-primary focus:ring-0 text-center font-display-verb text-[32px] lowercase outline-none transition-colors"
+            className={`w-full h-16 rounded-xl bg-surface-container-low border-2 border-surface-variant focus:border-primary focus:ring-0 text-center font-display-verb text-[32px] lowercase outline-none transition-colors ${isVocabMode ? 'text-2xl' : ''}`}
             autoFocus
             autoComplete="off"
             autoCorrect="off"
@@ -183,7 +241,7 @@ export function LessonSession({ lessonId, onBack }: { lessonId: string, onBack: 
                   {isCorrect ? 'Excellent!' : 'Not quite.'}
                 </h2>
                 <p className={`font-body-md text-body-md text-sm ${isCorrect ? 'text-on-success-container/80' : 'text-on-error-container/80'}`}>
-                  The correct answer is '{targetForm === 'pastSimple' ? currentVerb.pastSimple : currentVerb.pastParticiple}'.
+                  The correct answer is '{getCorrectAnswer()}'.
                 </p>
               </div>
             </div>

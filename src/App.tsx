@@ -5,12 +5,14 @@ import { VerbsList } from './VerbsList';
 import { Flashcards } from './Flashcards';
 import { Chat } from './Chat';
 import { InstallPrompt } from './InstallPrompt';
+import { SettingsSheet } from './SettingsSheet';
 import { useAppStore } from './store';
 
 type Tab = 'home' | 'learn' | 'verbs' | 'chat' | 'flashcards';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { state } = useAppStore();
 
   const renderContent = () => {
@@ -30,7 +32,9 @@ export default function App() {
       <header className="w-full top-0 sticky bg-background border-b-4 border-surface-variant z-40 hidden md:flex lg:flex">
         <div className="flex justify-between items-center px-margin-mobile py-stack-md w-full max-w-6xl mx-auto">
           <div className="flex items-center gap-gutter text-primary">
-            <h1 className="font-display-verb text-headline-lg-mobile md:text-headline-lg text-primary">VerbMaster</h1>
+            <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors" aria-label="Settings">
+              <span className="material-symbols-outlined text-[28px]">settings</span>
+            </button>
           </div>
           <div className="flex items-center gap-3 font-label-bold text-label-bold text-on-surface">
             <div className="flex items-center gap-2 bg-surface-container rounded-full pl-3 pr-1 py-1 border-2 border-surface-variant shadow-sm">
@@ -52,7 +56,9 @@ export default function App() {
 
       {/* Mobile Top App Bar */}
       <header className="w-full top-0 sticky z-40 bg-background border-b-4 border-surface-variant flex justify-between items-center px-margin-mobile py-stack-md md:hidden">
-        <h1 className="font-display-verb text-headline-lg-mobile text-primary">VerbMaster</h1>
+        <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors text-primary" aria-label="Settings">
+          <span className="material-symbols-outlined text-[28px]">settings</span>
+        </button>
         <div className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface">
           <div className="flex items-center gap-2 bg-surface-container rounded-full pl-3 pr-1 py-1 border-2 border-surface-variant shadow-sm">
             <span className="text-on-surface">{state.streak || 1}</span>
@@ -77,7 +83,7 @@ export default function App() {
           <NavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
-          <NavItem tab="verbs" icon="menu_book" label="Verbs" activeTab={activeTab} onClick={setActiveTab} />
+          <NavItem tab="verbs" icon="local_library" label="Library" activeTab={activeTab} onClick={setActiveTab} />
         </aside>
 
         {/* Main Content Area */}
@@ -90,9 +96,10 @@ export default function App() {
         <MobileNavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
-        <MobileNavItem tab="verbs" icon="menu_book" label="Verbs" activeTab={activeTab} onClick={setActiveTab} />
+        <MobileNavItem tab="verbs" icon="local_library" label="Library" activeTab={activeTab} onClick={setActiveTab} />
       </nav>
       <InstallPrompt />
+      {isSettingsOpen && <SettingsSheet onClose={() => setIsSettingsOpen(false)} />}
     </div>
   );
 }
