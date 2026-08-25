@@ -70,6 +70,20 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
+        <div className="flex flex-col items-center gap-3 mt-4 pt-6 border-t-2 border-surface-variant">
+          <p className="text-xs text-on-surface-variant text-center max-w-[280px] leading-relaxed">
+            Réalisé dans le cadre d'une formation en vibe coding par <span className="font-label-bold text-on-surface">SAVADOGO</span>
+          </p>
+          <a 
+            href="https://soumaila-savadogo.omnia-elearning.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-primary-container text-on-primary-container font-label-bold rounded-xl active:scale-95 transition-all shadow-sm border-2 border-transparent hover:border-primary-fixed-dim"
+          >
+            Je veux créer des apps sans coder aussi
+          </a>
+        </div>
+
       </div>
     </div>
   );

@@ -32,8 +32,8 @@ export default function App() {
       <header className="w-full top-0 sticky bg-background border-b-4 border-surface-variant z-40 hidden md:flex lg:flex">
         <div className="flex justify-between items-center px-margin-mobile py-stack-md w-full max-w-6xl mx-auto">
           <div className="flex items-center gap-gutter text-primary">
-            <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors" aria-label="Settings">
-              <span className="material-symbols-outlined text-[28px]">settings</span>
+            <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container border-2 border-surface-variant text-primary shadow-sm hover:bg-surface-container-high active:scale-95 transition-all" aria-label="Settings">
+              <span className="material-symbols-outlined text-[24px]">settings</span>
             </button>
           </div>
           <div className="flex items-center gap-3 font-label-bold text-label-bold text-on-surface">
@@ -56,8 +56,8 @@ export default function App() {
 
       {/* Mobile Top App Bar */}
       <header className="w-full top-0 sticky z-40 bg-background border-b-4 border-surface-variant flex justify-between items-center px-margin-mobile py-stack-md md:hidden">
-        <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors text-primary" aria-label="Settings">
-          <span className="material-symbols-outlined text-[28px]">settings</span>
+        <button onClick={() => setIsSettingsOpen(true)} className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container border-2 border-surface-variant text-primary shadow-sm hover:bg-surface-container-high active:scale-95 transition-all" aria-label="Settings">
+          <span className="material-symbols-outlined text-[24px]">settings</span>
         </button>
         <div className="flex items-center gap-2 font-label-bold text-label-bold text-on-surface">
           <div className="flex items-center gap-2 bg-surface-container rounded-full pl-3 pr-1 py-1 border-2 border-surface-variant shadow-sm">
