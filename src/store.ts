@@ -17,6 +17,18 @@ export interface UserVerbProgress {
 
 import { CategoryId } from './vocabData';
 
+export type ChallengeType = 'complete_lessons' | 'master_items';
+
+export interface Challenge {
+  id: string;
+  type: ChallengeType;
+  title: string;
+  target: number;
+  progress: number;
+  rewardXP: number;
+  completed: boolean;
+}
+
 export interface UserState {
   streak: number;
   lastActive: string | null;
@@ -29,9 +41,12 @@ export interface UserState {
   lessonsCompletedToday: number;
   lastLessonDate: string | null;
   audioSpeed: number;
+  challenges: Challenge[];
+  lastChallengeDate: string | null;
 }
 
 export interface Lesson {
+
   id: string;
   title: string;
   description: string;
@@ -67,7 +82,32 @@ const DEFAULT_STATE: UserState = {
   lessonsCompletedToday: 0,
   lastLessonDate: null,
   audioSpeed: 1.0,
+  challenges: [],
+  lastChallengeDate: null,
 };
+
+function generateDailyChallenges(): Challenge[] {
+  return [
+    {
+      id: `chal_lessons_${Date.now()}`,
+      type: 'complete_lessons',
+      title: 'Complete 3 lessons',
+      target: 3,
+      progress: 0,
+      rewardXP: 50,
+      completed: false
+    },
+    {
+      id: `chal_master_${Date.now()}`,
+      type: 'master_items',
+      title: 'Master 5 words or verbs',
+      target: 5,
+      progress: 0,
+      rewardXP: 100,
+      completed: false
+    }
+  ];
+}
 
 function isToday(dateString: string | null) {
   if (!dateString) return false;
@@ -97,7 +137,9 @@ if (saved) {
       dailyGoal: parsed.dailyGoal || 1,
       lessonsCompletedToday: parsed.lessonsCompletedToday || 0,
       lastLessonDate: parsed.lastLessonDate || null,
-      audioSpeed: parsed.audioSpeed || 1.0
+      audioSpeed: parsed.audioSpeed || 1.0,
+      challenges: parsed.challenges || [],
+      lastChallengeDate: parsed.lastChallengeDate || null,
     };
     // Calculate streak
     const lastActiveDate = new Date(globalState.lastActive || new Date());
@@ -122,10 +164,20 @@ if (saved) {
       globalState.lessonsCompletedToday = 0;
     }
 
+    if (!isToday(globalState.lastChallengeDate)) {
+      globalState.challenges = generateDailyChallenges();
+      globalState.lastChallengeDate = new Date().toISOString();
+    }
+
     localStorage.setItem('verbmaster_state', JSON.stringify(globalState));
   } catch (e) {
     globalState = DEFAULT_STATE;
+    globalState.challenges = generateDailyChallenges();
+    globalState.lastChallengeDate = new Date().toISOString();
   }
+} else {
+  globalState.challenges = generateDailyChallenges();
+  globalState.lastChallengeDate = new Date().toISOString();
 }
 
 const listeners = new Set<React.Dispatch<React.SetStateAction<UserState>>>();
@@ -146,6 +198,24 @@ export function useAppStore() {
     };
   }, []);
 
+  const updateChallengeProgress = (type: ChallengeType, amount: number = 1) => {
+    setGlobalState(s => {
+      let earnedXP = 0;
+      const newChallenges = s.challenges.map(chal => {
+        if (chal.type === type && !chal.completed) {
+          const newProgress = Math.min(chal.progress + amount, chal.target);
+          if (newProgress >= chal.target && !chal.completed) {
+            earnedXP += chal.rewardXP;
+            return { ...chal, progress: newProgress, completed: true };
+          }
+          return { ...chal, progress: newProgress };
+        }
+        return chal;
+      });
+      return { ...s, challenges: newChallenges, xp: s.xp + earnedXP };
+    });
+  };
+
   const addXp = (amount: number) => {
     setGlobalState(s => ({ ...s, xp: s.xp + amount }));
   };
@@ -162,6 +232,9 @@ export function useAppStore() {
         }
       }
     }));
+    if (level === 'mastered') {
+      updateChallengeProgress('master_items', 1);
+    }
   };
   
   const updateVocabMastery = (id: string, level: MasteryLevel) => {
@@ -176,6 +249,9 @@ export function useAppStore() {
         }
       }
     }));
+    if (level === 'mastered') {
+      updateChallengeProgress('master_items', 1);
+    }
   };
 
   const setActiveCategory = (categoryId: import('./vocabData').CategoryId) => {
@@ -191,6 +267,7 @@ export function useAppStore() {
   };
 
   const completeLesson = (id: string) => {
+    updateChallengeProgress('complete_lessons', 1);
     setGlobalState(s => {
       // Handle daily goal increment
       const isStillToday = isToday(s.lastLessonDate);
@@ -209,5 +286,5 @@ export function useAppStore() {
     });
   }
 
-  return { state, addXp, updateVerbMastery, updateVocabMastery, completeLesson, setDailyGoal, setActiveCategory, setAudioSpeed };
+  return { state, addXp, updateVerbMastery, updateVocabMastery, completeLesson, setDailyGoal, setActiveCategory, setAudioSpeed, updateChallengeProgress };
 }

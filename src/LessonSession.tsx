@@ -66,9 +66,10 @@ export function LessonSession({ lesson, onBack }: { lesson: Lesson, onBack: () =
       expectedStr = targetForm === 'pastSimple' ? currentItem.pastSimple : currentItem.pastParticiple;
     }
     
-    const acceptedAnswers = expectedStr.split(',').map(s => s.trim().toLowerCase());
+    const normalizeStr = (str: string) => str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const acceptedAnswers = expectedStr.split(/[,\/]/).map(normalizeStr);
     
-    if (acceptedAnswers.includes(input.trim().toLowerCase())) {
+    if (acceptedAnswers.includes(normalizeStr(input))) {
       setIsCorrect(true);
       playSuccessSound();
       if (isVocabMode) {
