@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 const RECENT_VIDEOS = [
   { id: '1A26NJCQnrk', title: 'English Fairy Tales - Recent Story 1' },
@@ -11,6 +11,34 @@ const RECENT_VIDEOS = [
 
 export function Videos() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const handleVideoClick = (videoId: string) => {
+    setActiveVideo(videoId);
+    // Scroll smoothly to the player when a video is clicked
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handlePrev = () => {
+    if (activeVideo) {
+      const idx = RECENT_VIDEOS.findIndex((v) => v.id === activeVideo);
+      if (idx > 0) handleVideoClick(RECENT_VIDEOS[idx - 1].id);
+    } else if (iframeRef.current) {
+      iframeRef.current.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'previousVideo' }), '*');
+    }
+  };
+
+  const handleNext = () => {
+    if (activeVideo) {
+      const idx = RECENT_VIDEOS.findIndex((v) => v.id === activeVideo);
+      if (idx < RECENT_VIDEOS.length - 1) handleVideoClick(RECENT_VIDEOS[idx + 1].id);
+    } else if (iframeRef.current) {
+      iframeRef.current.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'nextVideo' }), '*');
+    }
+  };
 
   return (
     <div className="flex-grow flex flex-col max-w-6xl mx-auto w-full gap-stack-lg p-margin-mobile pb-[100px] animate-fade-in">
@@ -25,25 +53,44 @@ export function Videos() {
       </header>
 
       {/* Featured Video Player */}
-      <div className="w-full bg-surface-container-low border-2 border-surface-variant rounded-2xl overflow-hidden shadow-sm">
+      <div ref={playerRef} className="w-full bg-surface-container-low border-2 border-surface-variant rounded-2xl overflow-hidden shadow-sm">
         <div className="relative w-full pb-[56.25%] bg-black">
           <iframe
+            ref={iframeRef}
             className="absolute top-0 left-0 w-full h-full"
-            src={`https://www.youtube.com/embed/${activeVideo || 'videoseries?list=UU8mWYDxedkJmUReAiA3ze9w'}`}
+            src={`https://www.youtube.com/embed/${activeVideo || 'videoseries?list=UU8mWYDxedkJmUReAiA3ze9w'}${activeVideo ? '?enablejsapi=1' : '&enablejsapi=1'}`}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </div>
-        <div className="p-stack-md flex items-center justify-between bg-surface-container">
-          <h2 className="font-label-bold text-on-surface">
-            {activeVideo ? "Now Playing" : "Latest Uploads Playlist"}
-          </h2>
+        <div className="p-stack-md flex items-center justify-between bg-surface-container gap-4">
+          <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+            <div className="flex items-center gap-1 bg-surface-container-high rounded-full p-1 border border-surface-variant flex-shrink-0">
+              <button 
+                onClick={handlePrev}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface"
+                aria-label="Previous Video"
+              >
+                <span className="material-symbols-outlined text-[20px]">skip_previous</span>
+              </button>
+              <button 
+                onClick={handleNext}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface"
+                aria-label="Next Video"
+              >
+                <span className="material-symbols-outlined text-[20px]">skip_next</span>
+              </button>
+            </div>
+            <h2 className="font-label-bold text-on-surface line-clamp-1 text-sm md:text-base">
+              {activeVideo ? "Now Playing" : "Latest Uploads Playlist"}
+            </h2>
+          </div>
           {activeVideo && (
             <button 
               onClick={() => setActiveVideo(null)}
-              className="text-primary font-label-bold text-sm bg-primary-container px-3 py-1 rounded-full hover:brightness-105 transition-all"
+              className="text-primary font-label-bold text-xs md:text-sm bg-primary-container px-3 py-2 rounded-full hover:brightness-105 transition-all flex-shrink-0"
             >
               Back to Playlist
             </button>
@@ -59,7 +106,7 @@ export function Videos() {
           {RECENT_VIDEOS.map((video) => (
             <button
               key={video.id}
-              onClick={() => setActiveVideo(video.id)}
+              onClick={() => handleVideoClick(video.id)}
               className="flex flex-col gap-3 group text-left"
             >
               <div className="relative w-full pb-[56.25%] rounded-xl overflow-hidden bg-surface-variant border-2 border-surface-variant group-hover:border-primary transition-colors">
