@@ -1,15 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-const RECENT_VIDEOS = [
-  { id: '1A26NJCQnrk', title: 'English Fairy Tales - Recent Story 1' },
-  { id: 'n7AiqSAvZAk', title: 'English Fairy Tales - Recent Story 2' },
-  { id: 'hH5-IWYertY', title: 'English Fairy Tales - Recent Story 3' },
-  { id: 'gBgq6Niqs9s', title: 'English Fairy Tales - Recent Story 4' },
-  { id: '2N8vYEQ2QA0', title: 'English Fairy Tales - Recent Story 5' },
-  { id: 'v9nYJxjyjUk', title: 'English Fairy Tales - Recent Story 6' },
-];
+type VideoItem = { id: string; title: string };
 
 export function Videos() {
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch('/api/youtube')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setVideos(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load videos:", err);
+        setLoading(false);
+      });
+  }, []);
+
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -24,8 +33,8 @@ export function Videos() {
 
   const handlePrev = () => {
     if (activeVideo) {
-      const idx = RECENT_VIDEOS.findIndex((v) => v.id === activeVideo);
-      if (idx > 0) handleVideoClick(RECENT_VIDEOS[idx - 1].id);
+      const idx = videos.findIndex((v) => v.id === activeVideo);
+      if (idx > 0) handleVideoClick(videos[idx - 1].id);
     } else if (iframeRef.current) {
       iframeRef.current.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'previousVideo' }), '*');
     }
@@ -33,8 +42,8 @@ export function Videos() {
 
   const handleNext = () => {
     if (activeVideo) {
-      const idx = RECENT_VIDEOS.findIndex((v) => v.id === activeVideo);
-      if (idx < RECENT_VIDEOS.length - 1) handleVideoClick(RECENT_VIDEOS[idx + 1].id);
+      const idx = videos.findIndex((v) => v.id === activeVideo);
+      if (idx < videos.length - 1) handleVideoClick(videos[idx + 1].id);
     } else if (iframeRef.current) {
       iframeRef.current.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'nextVideo' }), '*');
     }
@@ -103,7 +112,14 @@ export function Videos() {
           Recent Stories
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {RECENT_VIDEOS.map((video) => (
+          
+        {loading ? (
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 flex items-center justify-center p-8 text-on-surface-variant font-label-bold">
+            Loading latest stories from YouTube...
+          </div>
+        ) : (
+          videos.map((video) => (
+
             <button
               key={video.id}
               onClick={() => handleVideoClick(video.id)}
@@ -123,10 +139,11 @@ export function Videos() {
                 </div>
               </div>
               <h4 className="font-label-bold text-on-surface line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                Watch story
+                {video.title}
               </h4>
             </button>
-          ))}
+          ))
+        )}
         </div>
       </div>
     </div>
