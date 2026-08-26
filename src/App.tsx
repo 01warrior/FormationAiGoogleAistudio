@@ -3,12 +3,13 @@ import { Home } from './Home';
 import { LearnTimeline } from './LearnTimeline';
 import { VerbsList } from './VerbsList';
 import { Flashcards } from './Flashcards';
+import { Videos } from './Videos';
 import { Chat } from './Chat';
 import { InstallPrompt } from './InstallPrompt';
 import { SettingsSheet } from './SettingsSheet';
 import { useAppStore } from './store';
 
-type Tab = 'home' | 'learn' | 'verbs' | 'chat' | 'flashcards';
+type Tab = 'home' | 'learn' | 'verbs' | 'chat' | 'flashcards' | 'videos';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
@@ -22,6 +23,7 @@ export default function App() {
       case 'verbs': return <VerbsList />;
       case 'chat': return <Chat />;
       case 'flashcards': return <Flashcards />;
+      case 'videos': return <Videos />;
       default: return <Home onStartLearning={() => setActiveTab('learn')} />;
     }
   };
@@ -82,6 +84,7 @@ export default function App() {
           <NavItem tab="home" icon="home" label="Home" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
+          <NavItem tab="videos" icon="smart_display" label="Videos" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
           <NavItem tab="verbs" icon="local_library" label="Library" activeTab={activeTab} onClick={setActiveTab} />
         </aside>
@@ -95,6 +98,7 @@ export default function App() {
         <MobileNavItem tab="home" icon="home" label="Home" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="chat" icon="mic" label="Speak" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="flashcards" icon="style" label="Flashcards" activeTab={activeTab} onClick={setActiveTab} />
+        <MobileNavItem tab="videos" icon="smart_display" label="Videos" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="learn" icon="school" label="Learn" activeTab={activeTab} onClick={setActiveTab} />
         <MobileNavItem tab="verbs" icon="local_library" label="Library" activeTab={activeTab} onClick={setActiveTab} />
       </nav>
@@ -122,7 +126,7 @@ function MobileNavItem({ tab, icon, label, activeTab, onClick }: { tab: Tab, ico
   return (
     <button 
       onClick={() => onClick(tab)}
-      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-100 w-1/5 ${isActive ? 'bg-primary-container text-on-primary-container border-b-4 border-primary active:translate-y-[2px]' : 'text-on-surface-variant hover:bg-surface-container-high active:translate-y-[2px]'}`}
+      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-100 flex-1 ${isActive ? 'bg-primary-container text-on-primary-container border-b-4 border-primary active:translate-y-[2px]' : 'text-on-surface-variant hover:bg-surface-container-high active:translate-y-[2px]'}`}
     >
       <span className="material-symbols-outlined" style={{fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0"}}>{icon}</span>
       <span className="font-label-bold text-[10px] mt-1">{label}</span>
