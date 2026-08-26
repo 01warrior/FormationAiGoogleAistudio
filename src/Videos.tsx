@@ -7,10 +7,17 @@ export function Videos() {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    fetch('/api/youtube')
+    const rssUrl = encodeURIComponent('https://www.youtube.com/feeds/videos.xml?channel_id=UC8mWYDxedkJmUReAiA3ze9w');
+    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`)
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setVideos(data);
+        if (data && data.items) {
+          const formattedVideos = data.items.map((item: any) => {
+            const id = item.guid.replace('yt:video:', '');
+            return { id, title: item.title };
+          });
+          setVideos(formattedVideos);
+        }
         setLoading(false);
       })
       .catch(err => {
