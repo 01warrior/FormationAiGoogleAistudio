@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home } from './Home';
 import { LearnTimeline } from './LearnTimeline';
 import { VerbsList } from './VerbsList';
@@ -14,6 +14,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { state } = useAppStore();
+
+  // Reset scroll to top when changing tabs
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {
