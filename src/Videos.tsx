@@ -69,7 +69,7 @@ export function Videos() {
       </header>
 
       {/* Featured Video Player */}
-      <div ref={playerRef} className="w-full bg-surface-container-low border-2 border-surface-variant rounded-2xl overflow-hidden shadow-sm">
+      <div ref={playerRef} className="w-full bg-surface rounded-3xl border-4 border-surface-variant border-b-[8px] overflow-hidden shadow-xl transition-transform">
         <div className="relative w-full pb-[56.25%] bg-black">
           <iframe
             ref={iframeRef}
@@ -81,32 +81,32 @@ export function Videos() {
             allowFullScreen
           ></iframe>
         </div>
-        <div className="p-stack-md flex items-center justify-between bg-surface-container gap-4">
+        <div className="p-stack-md flex items-center justify-between bg-primary text-on-primary gap-4">
           <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-            <div className="flex items-center gap-1 bg-surface-container-high rounded-full p-1 border border-surface-variant flex-shrink-0">
+            <div className="flex items-center gap-1 bg-white/20 rounded-full p-1 border border-white/30 flex-shrink-0 shadow-inner">
               <button 
                 onClick={handlePrev}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/30 active:scale-95 transition-all text-on-primary"
                 aria-label="Previous Video"
               >
                 <span className="material-symbols-outlined text-[20px]">skip_previous</span>
               </button>
               <button 
                 onClick={handleNext}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest active:scale-95 transition-all text-on-surface"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/30 active:scale-95 transition-all text-on-primary"
                 aria-label="Next Video"
               >
                 <span className="material-symbols-outlined text-[20px]">skip_next</span>
               </button>
             </div>
-            <h2 className="font-label-bold text-on-surface line-clamp-1 text-sm md:text-base">
+            <h2 className="font-label-bold text-on-primary line-clamp-1 text-sm md:text-base">
               {activeVideo ? "Now Playing" : "Latest Uploads Playlist"}
             </h2>
           </div>
           {activeVideo && (
             <button 
               onClick={() => setActiveVideo(null)}
-              className="text-primary font-label-bold text-xs md:text-sm bg-primary-container px-3 py-2 rounded-full hover:brightness-105 transition-all flex-shrink-0"
+              className="text-primary font-label-bold text-xs md:text-sm bg-white px-4 py-2 rounded-full hover:bg-white/90 active:scale-95 transition-all flex-shrink-0 shadow-sm"
             >
               Back to Playlist
             </button>
