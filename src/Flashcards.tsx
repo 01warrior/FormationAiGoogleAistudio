@@ -149,11 +149,22 @@ export function Flashcards() {
                 </span>
                 
                 <div className="flex flex-col items-center justify-center text-center w-full flex-grow">
-                  <span className="font-display-verb text-[32px] text-secondary-container capitalize mb-4">
+                  <span className="font-display-verb text-[32px] text-secondary-container capitalize mb-2">
                     {currentItem.french}
                   </span>
                   
-                  <div className="w-full bg-surface-variant rounded-xl p-4 mt-4 border-l-4 border-primary text-left flex flex-col gap-2">
+                  {(currentItem.phonetic || currentItem.pronunciation) && (
+                    <div className="flex flex-col items-center gap-1 mb-2 bg-primary-container/20 px-4 py-2 rounded-xl">
+                      <span className="font-label-bold text-on-surface text-sm capitalize">{currentItem.english}</span>
+                      <div className="flex items-center gap-2 text-primary text-sm">
+                        {currentItem.phonetic && <span className="font-mono">{currentItem.phonetic}</span>}
+                        {currentItem.phonetic && currentItem.pronunciation && <span className="text-on-surface-variant opacity-50">•</span>}
+                        {currentItem.pronunciation && <span className="italic">"{currentItem.pronunciation}"</span>}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="w-full bg-surface-variant rounded-xl p-4 mt-2 border-l-4 border-primary text-left flex flex-col gap-2">
                     <span className="text-[10px] uppercase font-label-bold text-on-surface-variant">Example (English)</span>
                     <p className="font-body-md text-on-surface leading-snug">"{currentItem.example}"</p>
                     <button
@@ -193,7 +204,14 @@ export function Flashcards() {
                   <div className="flex items-center justify-between bg-primary-container text-on-primary-container font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-primary capitalize">
                     <div className="flex flex-col text-left">
                       <span className="text-[10px] uppercase opacity-80 font-sans tracking-wider">Infinitive</span>
-                      <span>{currentItem.base}</span>
+                      <div className="flex items-baseline gap-2">
+                        <span>{currentItem.base}</span>
+                        {(currentItem.basePhonetic || currentItem.basePronunciation) && (
+                          <span className="text-[10px] opacity-70 font-sans font-normal lowercase tracking-normal">
+                            [{currentItem.basePhonetic || currentItem.basePronunciation}]
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -209,7 +227,14 @@ export function Flashcards() {
                   <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
                     <div className="flex flex-col text-left">
                       <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Simple (Prétérit)</span>
-                      <span>{currentItem.pastSimple}</span>
+                      <div className="flex items-baseline gap-2">
+                        <span>{currentItem.pastSimple}</span>
+                        {(currentItem.pastPhonetic || currentItem.pastPronunciation) && (
+                          <span className="text-[10px] opacity-70 font-sans font-normal lowercase tracking-normal">
+                            [{currentItem.pastPhonetic || currentItem.pastPronunciation}]
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -225,7 +250,14 @@ export function Flashcards() {
                   <div className="flex items-center justify-between bg-surface-variant text-on-surface font-mono-verb text-mono-verb py-2.5 px-4 rounded-xl w-full border-b-4 border-outline-variant capitalize">
                     <div className="flex flex-col text-left">
                       <span className="text-[10px] uppercase opacity-70 font-sans tracking-wider">Past Participle</span>
-                      <span>{currentItem.pastParticiple}</span>
+                      <div className="flex items-baseline gap-2">
+                        <span>{currentItem.pastParticiple}</span>
+                        {(currentItem.participlePhonetic || currentItem.participlePronunciation) && (
+                          <span className="text-[10px] opacity-70 font-sans font-normal lowercase tracking-normal">
+                            [{currentItem.participlePhonetic || currentItem.participlePronunciation}]
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"

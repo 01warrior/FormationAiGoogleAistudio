@@ -3,43 +3,85 @@
     "base": "abide",
     "pastSimple": "abode",
     "pastParticiple": "abode",
-    "translation": "respecter, se conformer à"
+    "translation": "respecter, se conformer à",
+    "basePhonetic": "/əˈbaɪd/",
+    "basePronunciation": "eu-baïd",
+    "pastPhonetic": "/əˈboʊd/",
+    "pastPronunciation": "eu-boʊd",
+    "participlePhonetic": "/əˈbaɪdɪd/",
+    "participlePronunciation": "eu-baï-did"
   },
   {
     "base": "arise",
     "pastSimple": "arose",
     "pastParticiple": "arisen",
-    "translation": "survenir"
+    "translation": "survenir",
+    "basePhonetic": "/əˈraɪz/",
+    "basePronunciation": "eu-raïz",
+    "pastPhonetic": "/əˈroʊz/",
+    "pastPronunciation": "eu-roʊz",
+    "participlePhonetic": "/əˈrɪzən/",
+    "participlePronunciation": "eu-ri-zeun"
   },
   {
     "base": "awake",
     "pastSimple": "awoke",
     "pastParticiple": "awoken",
-    "translation": "se réveiller"
+    "translation": "se réveiller",
+    "basePhonetic": "/əˈweɪk/",
+    "basePronunciation": "eu-weik",
+    "pastPhonetic": "/əˈwoʊk/",
+    "pastPronunciation": "eu-woʊk",
+    "participlePhonetic": "/əˈwoʊkən/",
+    "participlePronunciation": "eu-woʊ-keun"
   },
   {
     "base": "be",
     "pastSimple": "was, were",
     "pastParticiple": "been",
-    "translation": "être"
+    "translation": "être",
+    "basePhonetic": "/bi/",
+    "basePronunciation": "bi",
+    "pastPhonetic": "/wəz, wər/",
+    "pastPronunciation": "weuz, wer",
+    "participlePhonetic": "/bɪn/",
+    "participlePronunciation": "bin"
   },
   {
     "base": "bear",
     "pastSimple": "bore",
     "pastParticiple": "borne, born",
-    "translation": "porter, supporter, naître"
+    "translation": "porter, supporter, naître",
+    "basePhonetic": "/ber/",
+    "basePronunciation": "ber",
+    "pastPhonetic": "/bɔːr/",
+    "pastPronunciation": "bor",
+    "participlePhonetic": "/bɔːrn/",
+    "participlePronunciation": "born"
   },
   {
     "base": "beat",
     "pastSimple": "beat",
     "pastParticiple": "beaten",
-    "translation": "battre"
+    "translation": "battre",
+    "basePhonetic": "/biːt/",
+    "basePronunciation": "bit",
+    "pastPhonetic": "/biːt/",
+    "pastPronunciation": "bit",
+    "participlePhonetic": "/ˈbiːtən/",
+    "participlePronunciation": "bi-teun"
   },
   {
     "base": "become",
     "pastSimple": "became",
     "pastParticiple": "become",
-    "translation": "devenir"
+    "translation": "devenir",
+    "basePhonetic": "/bɪˈkʌm/",
+    "basePronunciation": "bi-keum",
+    "pastPhonetic": "/bɪˈkeɪm/",
+    "pastPronunciation": "bi-keim",
+    "participlePhonetic": "/bɪˈkʌm/",
+    "participlePronunciation": "bi-keum"
   },
   {
     "base": "beget",
@@ -51,19 +93,37 @@
     "base": "begin",
     "pastSimple": "began",
     "pastParticiple": "begun",
-    "translation": "commencer"
+    "translation": "commencer",
+    "basePhonetic": "/bɪˈɡɪn/",
+    "basePronunciation": "bi-gin",
+    "pastPhonetic": "/bɪˈɡæn/",
+    "pastPronunciation": "bi-gan",
+    "participlePhonetic": "/bɪˈɡʌn/",
+    "participlePronunciation": "bi-geun"
   },
   {
     "base": "bend",
     "pastSimple": "bent",
     "pastParticiple": "bent",
-    "translation": "plier, se courber"
+    "translation": "plier, se courber",
+    "basePhonetic": "/bend/",
+    "basePronunciation": "bend",
+    "pastPhonetic": "/bent/",
+    "pastPronunciation": "bent",
+    "participlePhonetic": "/bent/",
+    "participlePronunciation": "bent"
   },
   {
     "base": "bet",
     "pastSimple": "bet",
     "pastParticiple": "bet",
-    "translation": "parier"
+    "translation": "parier",
+    "basePhonetic": "/bet/",
+    "basePronunciation": "bet",
+    "pastPhonetic": "/bet/",
+    "pastPronunciation": "bet",
+    "participlePhonetic": "/bet/",
+    "participlePronunciation": "bet"
   },
   {
     "base": "bid",
@@ -75,25 +135,49 @@
     "base": "bite",
     "pastSimple": "bit",
     "pastParticiple": "bitten",
-    "translation": "mordre"
+    "translation": "mordre",
+    "basePhonetic": "/baɪt/",
+    "basePronunciation": "baït",
+    "pastPhonetic": "/bɪt/",
+    "pastPronunciation": "bit",
+    "participlePhonetic": "/ˈbɪtən/",
+    "participlePronunciation": "bi-teun"
   },
   {
     "base": "bleed",
     "pastSimple": "bled",
     "pastParticiple": "bled",
-    "translation": "saigner"
+    "translation": "saigner",
+    "basePhonetic": "/bliːd/",
+    "basePronunciation": "blid",
+    "pastPhonetic": "/bled/",
+    "pastPronunciation": "bled",
+    "participlePhonetic": "/bled/",
+    "participlePronunciation": "bled"
   },
   {
     "base": "blow",
     "pastSimple": "blew",
     "pastParticiple": "blown",
-    "translation": "souffler, gonfler"
+    "translation": "souffler, gonfler",
+    "basePhonetic": "/bloʊ/",
+    "basePronunciation": "blo",
+    "pastPhonetic": "/bluː/",
+    "pastPronunciation": "blou",
+    "participlePhonetic": "/bloʊn/",
+    "participlePronunciation": "blon"
   },
   {
     "base": "break",
     "pastSimple": "broke",
     "pastParticiple": "broken",
-    "translation": "casser"
+    "translation": "casser",
+    "basePhonetic": "/breɪk/",
+    "basePronunciation": "breik",
+    "pastPhonetic": "/broʊk/",
+    "pastPronunciation": "brok",
+    "participlePhonetic": "/ˈbroʊkən/",
+    "participlePronunciation": "bro-keun"
   },
   {
     "base": "breed",
@@ -105,37 +189,73 @@
     "base": "bring",
     "pastSimple": "brought",
     "pastParticiple": "brought",
-    "translation": "apporter"
+    "translation": "apporter",
+    "basePhonetic": "/brɪŋ/",
+    "basePronunciation": "bring",
+    "pastPhonetic": "/brɔːt/",
+    "pastPronunciation": "brot",
+    "participlePhonetic": "/brɔːt/",
+    "participlePronunciation": "brot"
   },
   {
     "base": "broadcast",
     "pastSimple": "broadcast",
     "pastParticiple": "broadcast",
-    "translation": "diffuser, émettre"
+    "translation": "diffuser, émettre",
+    "basePhonetic": "/ˈbrɔːdkæst/",
+    "basePronunciation": "brod-kast",
+    "pastPhonetic": "/ˈbrɔːdkæst/",
+    "pastPronunciation": "brod-kast",
+    "participlePhonetic": "/ˈbrɔːdkæst/",
+    "participlePronunciation": "brod-kast"
   },
   {
     "base": "build",
     "pastSimple": "built",
     "pastParticiple": "built",
-    "translation": "construire"
+    "translation": "construire",
+    "basePhonetic": "/bɪld/",
+    "basePronunciation": "bild",
+    "pastPhonetic": "/bɪlt/",
+    "pastPronunciation": "bilt",
+    "participlePhonetic": "/bɪlt/",
+    "participlePronunciation": "bilt"
   },
   {
     "base": "burn",
     "pastSimple": "burnt, burned",
     "pastParticiple": "burnt, burned",
-    "translation": "brûler"
+    "translation": "brûler",
+    "basePhonetic": "/bɜːrn/",
+    "basePronunciation": "beurn",
+    "pastPhonetic": "/bɜːrnd, bɜːrnt/",
+    "pastPronunciation": "beurnd, beurnt",
+    "participlePhonetic": "/bɜːrnd, bɜːrnt/",
+    "participlePronunciation": "beurnd, beurnt"
   },
   {
     "base": "burst",
     "pastSimple": "burst",
     "pastParticiple": "burst",
-    "translation": "éclater"
+    "translation": "éclater",
+    "basePhonetic": "/bɜːrst/",
+    "basePronunciation": "beurst",
+    "pastPhonetic": "/bɜːrst/",
+    "pastPronunciation": "beurst",
+    "participlePhonetic": "/bɜːrst/",
+    "participlePronunciation": "beurst"
   },
   {
     "base": "buy",
     "pastSimple": "bought",
     "pastParticiple": "bought",
-    "translation": "acheter"
+    "translation": "acheter",
+    "basePhonetic": "/baɪ/",
+    "basePronunciation": "baï",
+    "pastPhonetic": "/bɔːt/",
+    "pastPronunciation": "bot",
+    "participlePhonetic": "/bɔːt/",
+    "participlePronunciation": "bot"
   },
   {
     "base": "can",
@@ -153,7 +273,13 @@
     "base": "catch",
     "pastSimple": "caught",
     "pastParticiple": "caught",
-    "translation": "attraper"
+    "translation": "attraper",
+    "basePhonetic": "/kætʃ/",
+    "basePronunciation": "katch",
+    "pastPhonetic": "/kɔːt/",
+    "pastPronunciation": "kot",
+    "participlePhonetic": "/kɔːt/",
+    "participlePronunciation": "kot"
   },
   {
     "base": "chide",
@@ -165,7 +291,13 @@
     "base": "choose",
     "pastSimple": "chose",
     "pastParticiple": "chosen",
-    "translation": "choisir"
+    "translation": "choisir",
+    "basePhonetic": "/tʃuːz/",
+    "basePronunciation": "tchouz",
+    "pastPhonetic": "/tʃoʊz/",
+    "pastPronunciation": "tchoz",
+    "participlePhonetic": "/ˈtʃoʊzən/",
+    "participlePronunciation": "tcho-zeun"
   },
   {
     "base": "cling",
@@ -183,13 +315,25 @@
     "base": "come",
     "pastSimple": "came",
     "pastParticiple": "come",
-    "translation": "venir"
+    "translation": "venir",
+    "basePhonetic": "/kʌm/",
+    "basePronunciation": "keum",
+    "pastPhonetic": "/keɪm/",
+    "pastPronunciation": "keim",
+    "participlePhonetic": "/kʌm/",
+    "participlePronunciation": "keum"
   },
   {
     "base": "cost",
     "pastSimple": "cost",
     "pastParticiple": "cost",
-    "translation": "coûter"
+    "translation": "coûter",
+    "basePhonetic": "/kɔːst/",
+    "basePronunciation": "kost",
+    "pastPhonetic": "/kɔːst/",
+    "pastPronunciation": "kost",
+    "participlePhonetic": "/kɔːst/",
+    "participlePronunciation": "kost"
   },
   {
     "base": "creep",
@@ -201,7 +345,13 @@
     "base": "cut",
     "pastSimple": "cut",
     "pastParticiple": "cut",
-    "translation": "couper"
+    "translation": "couper",
+    "basePhonetic": "/kʌt/",
+    "basePronunciation": "keut",
+    "pastPhonetic": "/kʌt/",
+    "pastPronunciation": "keut",
+    "participlePhonetic": "/kʌt/",
+    "participlePronunciation": "keut"
   },
   {
     "base": "deal",
@@ -213,7 +363,13 @@
     "base": "dig",
     "pastSimple": "dug",
     "pastParticiple": "dug",
-    "translation": "creuser"
+    "translation": "creuser",
+    "basePhonetic": "/dɪɡ/",
+    "basePronunciation": "dig",
+    "pastPhonetic": "/dʌɡ/",
+    "pastPronunciation": "deug",
+    "participlePhonetic": "/dʌɡ/",
+    "participlePronunciation": "deug"
   },
   {
     "base": "dive",
@@ -225,31 +381,61 @@
     "base": "do",
     "pastSimple": "did",
     "pastParticiple": "done",
-    "translation": "faire"
+    "translation": "faire",
+    "basePhonetic": "/du/",
+    "basePronunciation": "dou",
+    "pastPhonetic": "/dɪd/",
+    "pastPronunciation": "did",
+    "participlePhonetic": "/dʌn/",
+    "participlePronunciation": "done"
   },
   {
     "base": "draw",
     "pastSimple": "drew",
     "pastParticiple": "drawn",
-    "translation": "dessiner, tirer"
+    "translation": "dessiner, tirer",
+    "basePhonetic": "/drɔː/",
+    "basePronunciation": "dro",
+    "pastPhonetic": "/druː/",
+    "pastPronunciation": "drou",
+    "participlePhonetic": "/drɔːn/",
+    "participlePronunciation": "dron"
   },
   {
     "base": "dream",
     "pastSimple": "dreamt, dreamed",
     "pastParticiple": "dreamt, dreamed",
-    "translation": "rêver"
+    "translation": "rêver",
+    "basePhonetic": "/driːm/",
+    "basePronunciation": "drim",
+    "pastPhonetic": "/dremt, driːmd/",
+    "pastPronunciation": "dremt, drimd",
+    "participlePhonetic": "/dremt, driːmd/",
+    "participlePronunciation": "dremt, drimd"
   },
   {
     "base": "drink",
     "pastSimple": "drank",
     "pastParticiple": "drunk",
-    "translation": "boire"
+    "translation": "boire",
+    "basePhonetic": "/drɪŋk/",
+    "basePronunciation": "drink",
+    "pastPhonetic": "/dræŋk/",
+    "pastPronunciation": "drank",
+    "participlePhonetic": "/drʌŋk/",
+    "participlePronunciation": "dreunk"
   },
   {
     "base": "drive",
     "pastSimple": "drove",
     "pastParticiple": "driven",
-    "translation": "conduire"
+    "translation": "conduire",
+    "basePhonetic": "/draɪv/",
+    "basePronunciation": "draïv",
+    "pastPhonetic": "/droʊv/",
+    "pastPronunciation": "drov",
+    "participlePhonetic": "/ˈdrɪvən/",
+    "participlePronunciation": "dri-veun"
   },
   {
     "base": "dwell",
@@ -261,13 +447,25 @@
     "base": "eat",
     "pastSimple": "ate",
     "pastParticiple": "eaten",
-    "translation": "manger"
+    "translation": "manger",
+    "basePhonetic": "/iːt/",
+    "basePronunciation": "it",
+    "pastPhonetic": "/eɪt/",
+    "pastPronunciation": "eit",
+    "participlePhonetic": "/ˈiːtən/",
+    "participlePronunciation": "i-teun"
   },
   {
     "base": "fall",
     "pastSimple": "fell",
     "pastParticiple": "fallen",
-    "translation": "tomber"
+    "translation": "tomber",
+    "basePhonetic": "/fɔːl/",
+    "basePronunciation": "fol",
+    "pastPhonetic": "/fel/",
+    "pastPronunciation": "fel",
+    "participlePhonetic": "/ˈfɔːlən/",
+    "participlePronunciation": "fo-leun"
   },
   {
     "base": "feed",
@@ -279,19 +477,37 @@
     "base": "feel",
     "pastSimple": "felt",
     "pastParticiple": "felt",
-    "translation": "se sentir, ressentir"
+    "translation": "se sentir, ressentir",
+    "basePhonetic": "/fiːl/",
+    "basePronunciation": "fil",
+    "pastPhonetic": "/felt/",
+    "pastPronunciation": "felt",
+    "participlePhonetic": "/felt/",
+    "participlePronunciation": "felt"
   },
   {
     "base": "fight",
     "pastSimple": "fought",
     "pastParticiple": "fought",
-    "translation": "se battre"
+    "translation": "se battre",
+    "basePhonetic": "/faɪt/",
+    "basePronunciation": "faït",
+    "pastPhonetic": "/fɔːt/",
+    "pastPronunciation": "fot",
+    "participlePhonetic": "/fɔːt/",
+    "participlePronunciation": "fot"
   },
   {
     "base": "find",
     "pastSimple": "found",
     "pastParticiple": "found",
-    "translation": "trouver"
+    "translation": "trouver",
+    "basePhonetic": "/faɪnd/",
+    "basePronunciation": "faïnd",
+    "pastPhonetic": "/faʊnd/",
+    "pastPronunciation": "faʊnd",
+    "participlePhonetic": "/faʊnd/",
+    "participlePronunciation": "faʊnd"
   },
   {
     "base": "flee",
@@ -309,7 +525,13 @@
     "base": "fly",
     "pastSimple": "flew",
     "pastParticiple": "flown",
-    "translation": "voler"
+    "translation": "voler",
+    "basePhonetic": "/flaɪ/",
+    "basePronunciation": "flaï",
+    "pastPhonetic": "/fluː/",
+    "pastPronunciation": "flou",
+    "participlePhonetic": "/floʊn/",
+    "participlePronunciation": "flon"
   },
   {
     "base": "forbid",
@@ -333,13 +555,25 @@
     "base": "forget",
     "pastSimple": "forgot",
     "pastParticiple": "forgotten, forgot",
-    "translation": "oublier"
+    "translation": "oublier",
+    "basePhonetic": "/fərˈɡet/",
+    "basePronunciation": "feur-get",
+    "pastPhonetic": "/fərˈɡɑːt/",
+    "pastPronunciation": "feur-gat",
+    "participlePhonetic": "/fərˈɡɑːtən/",
+    "participlePronunciation": "feur-ga-teun"
   },
   {
     "base": "forgive",
     "pastSimple": "forgave",
     "pastParticiple": "forgiven",
-    "translation": "pardonner"
+    "translation": "pardonner",
+    "basePhonetic": "/fərˈɡɪv/",
+    "basePronunciation": "feur-giv",
+    "pastPhonetic": "/fərˈɡeɪv/",
+    "pastPronunciation": "feur-geiv",
+    "participlePhonetic": "/fərˈɡɪvən/",
+    "participlePronunciation": "feur-gi-veun"
   },
   {
     "base": "forsake",
@@ -351,13 +585,25 @@
     "base": "freeze",
     "pastSimple": "froze",
     "pastParticiple": "frozen",
-    "translation": "geler"
+    "translation": "geler",
+    "basePhonetic": "/friːz/",
+    "basePronunciation": "friz",
+    "pastPhonetic": "/froʊz/",
+    "pastPronunciation": "froz",
+    "participlePhonetic": "/ˈfroʊzən/",
+    "participlePronunciation": "fro-zeun"
   },
   {
     "base": "get",
     "pastSimple": "got",
     "pastParticiple": "gotten, got",
-    "translation": "obtenir"
+    "translation": "obtenir",
+    "basePhonetic": "/ɡet/",
+    "basePronunciation": "get",
+    "pastPhonetic": "/ɡɑːt/",
+    "pastPronunciation": "gat",
+    "participlePhonetic": "/ɡɑːtən/",
+    "participlePronunciation": "ga-teun"
   },
   {
     "base": "give",
@@ -393,7 +639,13 @@
     "base": "have",
     "pastSimple": "had",
     "pastParticiple": "had",
-    "translation": "avoir"
+    "translation": "avoir",
+    "basePhonetic": "/hæv/",
+    "basePronunciation": "hav",
+    "pastPhonetic": "/hæd/",
+    "pastPronunciation": "had",
+    "participlePhonetic": "/hæd/",
+    "participlePronunciation": "had"
   },
   {
     "base": "hear",

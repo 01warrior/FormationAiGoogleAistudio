@@ -6,6 +6,12 @@ export interface Verb {
   pastSimple: string;
   pastParticiple: string;
   translation: string;
+  basePhonetic?: string;
+  basePronunciation?: string;
+  pastPhonetic?: string;
+  pastPronunciation?: string;
+  participlePhonetic?: string;
+  participlePronunciation?: string;
 }
 
 export type MasteryLevel = 'unseen' | 'learning' | 'mastered';
